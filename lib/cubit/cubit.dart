@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:auto_id/layouts/User_screen.dart';
 import 'package:auto_id/layouts/add_group.dart';
-import 'package:auto_id/layouts/change_password.dart';
+import '../layouts/sign_pages/change_password.dart';
 import 'package:auto_id/layouts/edit_user.dart';
 import 'package:auto_id/layouts/group_screen.dart';
-import 'package:auto_id/layouts/login_page.dart';
+import '../layouts/sign_pages/login_page.dart';
 import 'package:auto_id/layouts/main_screen.dart';
 import 'package:auto_id/reusable/reuse_components.dart';
 import 'package:bloc/bloc.dart';
@@ -84,11 +84,11 @@ class AppCubit extends Cubit<AppStates> {
 
   void getFireData() {
     emit(FireDataGetting());
+    print("fire data");
     dataBase.child(phone).once().then((snap) {
       this.currentUserId = "${snap.value['lastID'].split(',')[0]}";
       this.currentUserState = "${snap.value['lastID'].split(',')[1]}";
 
-      //
       var data = snap.value['data'].split(',');
       var temp = '';
       if (data[0].toString().isNotEmpty) {
@@ -172,6 +172,10 @@ class AppCubit extends Cubit<AppStates> {
         lastUserName = dataToSent['Name'];
         lastUserGroupIndex = activeGroup;
         currentUserGroupImageUrl = "";
+        dataBase.child(phone).update({
+          "lastID": "$currentUserId,new",
+          "data": "g$groupIndex,$lastUserName,photo"
+        });
       }
       activeGroup = 0;
       navigateAndReplace(context, MainScreen());
@@ -205,6 +209,9 @@ class AppCubit extends Cubit<AppStates> {
       }
       navigateAndPush(context, UserScreen(userIndex, groupIndex));
       emit(GetGroupPersonDone());
+    }).catchError((onError) {
+      emit(GetGroupPersonError());
+      print(onError);
     });
   }
 
@@ -218,9 +225,7 @@ class AppCubit extends Cubit<AppStates> {
           "https://script.google.com/macros/s/AKfycbwCgPd0uvbcYCrn3D5v-4GsH_E9OhMUakXe2D3tY0phqN3nxivfWn3efJ4TE6ckqgXa/exec?" +
               "userName=$phone" +
               "&group=$index");
-      http.read(url).catchError((err) {
-        emit(GoToEditUserError());
-      }).then((value) {
+      http.read(url).then((value) {
         if (!value.startsWith('<!DOCTYPE')) {
           var list = value.split("!");
           activeGroupNames = list[0].split(',');
@@ -228,6 +233,9 @@ class AppCubit extends Cubit<AppStates> {
         }
         navigateAndPush(context, EditUserScreen(currentUserId, index, false));
         emit(GoToEditUserDone());
+      }).catchError((onError) {
+        emit(GoToEditUserError());
+        print(onError);
       });
     } else {
       navigateAndPush(context, EditUserScreen(currentUserId, index, false));
@@ -287,20 +295,23 @@ class AppCubit extends Cubit<AppStates> {
 
   Future<void> getGroupNames() async {
     emit(GetGroupDataLoading());
-    dataBase.child(phone).once().then((snap) {
-      //  snapshot = await
-      var doc = snap.value;
-      groupLen = doc['nGroups'];
-      dataBase.child(phone).child("Groups").once().then((snap) {
-        doc = snap.value;
-        groupNames = [];
-        for (int i = 1; i <= groupLen; i++) {
-          groupNames.add(doc['g$i'].split(',')[1]);
-        }
-        groupsExist = true;
-        emit(GetGroupDatDone());
+    print("phone $phone");
+    if (phone.isNotEmpty) {
+      dataBase.child(phone).once().then((snap) {
+        var doc = snap.value;
+        print(doc);
+        groupLen = doc['nGroups'];
+        dataBase.child(phone).child("Groups").once().then((snap) {
+          doc = snap.value;
+          groupNames = [];
+          for (int i = 1; i <= groupLen; i++) {
+            groupNames.add(doc['g$i'].split(',')[1]);
+          }
+          groupsExist = true;
+          emit(GetGroupDatDone());
+        });
       });
-    });
+    }
   }
 
   void getNamesFromBoolean() {
@@ -577,7 +588,6 @@ class AppCubit extends Cubit<AppStates> {
       validateNumberForFirst = true;
       emit(UserValidateDone());
     });
-// authentication process ----
   }
 
   Future changePassword(BuildContext context, String newPass) async {
@@ -591,13 +601,12 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   // get data from the shared preferences to login .....
-  void getUserLoginData(BuildContext context) async {
+  void getUserLoginData(bool isHere) async {
     emit(CheckUserStateLoading());
     final prefs = await SharedPreferences.getInstance();
-    if (prefs.getBool("rememberMe") == true) {
+    if (isHere) {
       String phone = prefs.getString("phone")!;
       this.phone = phone;
-      navigateAndReplace(context, MainScreen());
       emit(UserLogInDone());
     }
     emit(CheckUserStateDone());
@@ -726,7 +735,6 @@ class AppCubit extends Cubit<AppStates> {
     navigateAndReplace(context, MainScreen());
   }
 
-  // save data to shared preferences
   void saveData(String phone) async {
     this.phone = phone;
     final prefs = await SharedPreferences.getInstance();

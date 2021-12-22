@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'forgetPassPage.dart';
-import 'new_sheet.dart';
+import '../forgetPassPage.dart';
+import 'create_acount.dart';
 
 // ignore: must_be_immutable
 class LoginPage extends StatelessWidget {
@@ -21,10 +21,7 @@ class LoginPage extends StatelessWidget {
       listener: (BuildContext context, AppStates state) {},
       builder: (BuildContext context, AppStates state) {
         AppCubit cubit = AppCubit.get(context);
-        if (!inBefore) {
-          cubit.getUserLoginData(context);
-          inBefore = true;
-        }
+
         return SafeArea(
             child: GestureDetector(
           onTap: () {
