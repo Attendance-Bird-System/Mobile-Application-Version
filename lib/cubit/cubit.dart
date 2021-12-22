@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:auto_id/layouts/User_screen.dart';
 import 'package:auto_id/layouts/add_group.dart';
@@ -81,6 +82,7 @@ class AppCubit extends Cubit<AppStates> {
   String lastUserName = "";
   int lastUserGroupIndex = 0;
   String currentUserGroupImageUrl = "";
+  StreamSubscription? listener;
 
   void getFireData() {
     emit(FireDataGetting());
@@ -105,7 +107,7 @@ class AppCubit extends Cubit<AppStates> {
     }).then((value) {
       emit(FireDataGot());
     });
-    dataBase.child(this.phone).onChildChanged.listen((event) {
+    listener = dataBase.child(this.phone).onChildChanged.listen((event) {
       emit(FireDataGetting());
       DataSnapshot snap = event.snapshot;
       switch (snap.key) {
@@ -164,9 +166,10 @@ class AppCubit extends Cubit<AppStates> {
             "&user_data=$dataToSent" +
             "&person_id=$id" +
             "&userName=$phone");
-    http.read(url).catchError((err) {
-      emit(SendToEditError());
-    }).then((value) {
+    print(url);
+    http.read(url).then((value) {
+      print("returned Data");
+      print(value);
       if (currentUserState == "notfound" && currentUserId == id) {
         currentUserState = "new";
         lastUserName = dataToSent['Name'];
@@ -179,6 +182,9 @@ class AppCubit extends Cubit<AppStates> {
       }
       activeGroup = 0;
       navigateAndReplace(context, MainScreen());
+    }).catchError((err) {
+      print("error is $err");
+      emit(SendToEditError());
     });
   }
 
@@ -684,11 +690,12 @@ class AppCubit extends Cubit<AppStates> {
 
   void userLogOut(BuildContext context) async {
     emit(UserLogOutLoading());
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('rememberMe', false);
     hidePassword = true;
     rememberMe = false;
     validateNumber = false;
     groupLen = 0;
-    groupsExist = false;
     userPhone = '';
     verifiedID = '';
     phone = "";
@@ -721,7 +728,6 @@ class AppCubit extends Cubit<AppStates> {
     activeGroupColumns = [];
     activeGroup = 0;
     userImageUrl = '';
-    currentUserId = "";
     activeGroup = 0;
     userImageUrl = '';
     currentUserId = "";
@@ -729,10 +735,10 @@ class AppCubit extends Cubit<AppStates> {
     lastUserName = "";
     lastUserGroupIndex = 0;
     currentUserGroupImageUrl = "";
-
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool('rememberMe', rememberMe);
-    navigateAndReplace(context, MainScreen());
+    groupsExist = false;
+    currentUserId = "";
+    listener!.cancel();
+    navigateAndReplace(context, LoginPage());
   }
 
   void saveData(String phone) async {

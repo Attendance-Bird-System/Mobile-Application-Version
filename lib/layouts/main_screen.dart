@@ -23,7 +23,7 @@ class MainScreen extends StatelessWidget {
       builder: (BuildContext context, AppStates state) {
         AppCubit cubit = AppCubit.get(context);
 
-        if (cubit.groupsExist == false) {
+        if (cubit.groupsExist == false && !(state is GetGroupDataLoading)) {
           cubit.getGroupNames();
         }
         if (cubit.groupsExist == true && cubit.currentUserId == "") {
@@ -69,459 +69,464 @@ class MainScreen extends StatelessWidget {
                 cubit.addGroup(context);
               },
             ),
-            body: Container(
-                padding: EdgeInsets.all(15),
-                child: Container(
-                  child: Column(
-                    children: [
-                      cubit.currentUserId == "NULL" || cubit.currentUserId == ""
-                          ? Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                  decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.orange),
-                                      borderRadius: BorderRadius.circular(20)),
-                                  width: double.infinity,
-                                  height: 200,
-                                  child: Column(
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    cubit.currentUserId == "NULL" || cubit.currentUserId == ""
+                        ? Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.orange),
+                                    borderRadius: BorderRadius.circular(20)),
+                                width: double.infinity,
+                                height: 200,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.label_off,
+                                      color: Colors.grey,
+                                      size: 80,
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      "No ID yet",
+                                      style: TextStyle(
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    )
+                                  ],
+                                )),
+                          )
+                        : Container(
+                            child: cubit.currentUserState != "notfound"
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                        border:
+                                            Border.all(color: Colors.orange),
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 5.0),
+                                          child: Text(
+                                            'Last Scan',
+                                            style: TextStyle(
+                                                color: customGray,
+                                                fontSize: 35,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        state is FireDataGetting ||
+                                                cubit.groupsExist == false
+                                            ? Container(
+                                                width: double.infinity,
+                                                height: 180,
+                                                child:
+                                                    CupertinoActivityIndicator(
+                                                  radius: 20,
+                                                ),
+                                              )
+                                            : Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Center(
+                                                              child: Text(
+                                                                '${cubit.lastUserName}',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .orange,
+                                                                    fontSize:
+                                                                        20,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                            Text(
+                                                                'Group : ${cubit.groupNames[cubit.lastUserGroupIndex - 1 == -1 ? 0 : cubit.lastUserGroupIndex - 1]}'),
+                                                            SizedBox(
+                                                              height: 5,
+                                                            ),
+                                                            Text(
+                                                                'ID : ${cubit.currentUserId}'),
+                                                            SizedBox(
+                                                              height: 5,
+                                                            ),
+                                                            cubit.currentUserState ==
+                                                                    "new"
+                                                                ? Wrap(
+                                                                    crossAxisAlignment:
+                                                                        WrapCrossAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      Text(
+                                                                        'not Registered ',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                          color:
+                                                                              Colors.red,
+                                                                        ),
+                                                                      ),
+                                                                      Icon(
+                                                                        Icons
+                                                                            .error_outline,
+                                                                        color: Colors
+                                                                            .red,
+                                                                      )
+                                                                    ],
+                                                                  )
+                                                                : Row(
+                                                                    children: [
+                                                                      Text(
+                                                                        'Process completed',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                          color:
+                                                                              Colors.green,
+                                                                        ),
+                                                                      ),
+                                                                      Icon(
+                                                                        Icons
+                                                                            .check,
+                                                                        color: Colors
+                                                                            .green,
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                          ]),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Container(
+                                                        width: 50,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                          color: Colors.orange,
+                                                        ),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(5.0),
+                                                          child: ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8.0),
+                                                              child: FadeInImage
+                                                                  .assetNetwork(
+                                                                placeholder:
+                                                                    'images/avatar.png',
+                                                                imageErrorBuilder:
+                                                                    (
+                                                                  context,
+                                                                  error,
+                                                                  stackTrace,
+                                                                ) {
+                                                                  return Container(
+                                                                    width: 50,
+                                                                    child:
+                                                                        Center(
+                                                                      child: Image
+                                                                          .asset(
+                                                                              'images/avatar.png'),
+                                                                    ),
+                                                                  );
+                                                                },
+                                                                image:
+                                                                    '${cubit.currentUserGroupImageUrl}',
+                                                              )),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
+                                              )
+                                      ],
+                                    ),
+                                  )
+                                : Container(
+                                    child: Container(
+                                    decoration: BoxDecoration(
+                                        border:
+                                            Border.all(color: Colors.orange),
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 5.0),
+                                          child: Text(
+                                            'Last Scan',
+                                            style: TextStyle(
+                                                color: customGray,
+                                                fontSize: 35,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        state is FireDataGetting ||
+                                                cubit.groupsExist == false
+                                            ? Container(
+                                                width: double.infinity,
+                                                height: 150,
+                                                child:
+                                                    CupertinoActivityIndicator(
+                                                  radius: 20,
+                                                ),
+                                              )
+                                            : Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Center(
+                                                              child: Text(
+                                                                'User doesn\'t exist',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .red,
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                            SizedBox(
+                                                              height: 5,
+                                                            ),
+                                                            Text(
+                                                              'ID : ${cubit.currentUserId}',
+                                                              style: TextStyle(
+                                                                  color:
+                                                                      customGray,
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                            SizedBox(
+                                                              height: 5,
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .all(
+                                                                      15.0),
+                                                              child: Center(
+                                                                child:
+                                                                    TextButton(
+                                                                        child: Text(
+                                                                            "Add the user",
+                                                                            style: TextStyle(
+                                                                                color: Colors
+                                                                                    .green,
+                                                                                fontSize:
+                                                                                    15)),
+                                                                        style: ButtonStyle(
+                                                                            padding:
+                                                                                MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(15)),
+                                                                            foregroundColor: MaterialStateProperty.all<Color>(Colors.lightGreen),
+                                                                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0), side: BorderSide(color: Colors.green)))),
+                                                                        onPressed: () {
+                                                                          showGeneralDialog(
+                                                                            barrierLabel:
+                                                                                "Barrier",
+                                                                            barrierDismissible:
+                                                                                true,
+                                                                            barrierColor:
+                                                                                Colors.black.withOpacity(0.5),
+                                                                            transitionDuration:
+                                                                                Duration(milliseconds: 700),
+                                                                            context:
+                                                                                context,
+                                                                            pageBuilder: (_,
+                                                                                __,
+                                                                                ___) {
+                                                                              return Align(
+                                                                                alignment: Alignment.bottomCenter,
+                                                                                child: Container(
+                                                                                  height: 200,
+                                                                                  child: Padding(
+                                                                                    padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                                                                                    child: Column(
+                                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                                      children: [
+                                                                                        Text(
+                                                                                          'Adding the user to sheet ',
+                                                                                          style: TextStyle(decoration: TextDecoration.none, fontSize: 18, color: Colors.orange),
+                                                                                        ),
+                                                                                        SizedBox(
+                                                                                          height: 10,
+                                                                                        ),
+                                                                                        Text(
+                                                                                          'step 1 : choose the group',
+                                                                                          style: TextStyle(decoration: TextDecoration.none, fontSize: 15, color: customGray),
+                                                                                        ),
+                                                                                        Expanded(
+                                                                                          child: ListView.separated(
+                                                                                              scrollDirection: Axis.horizontal,
+                                                                                              itemCount: cubit.groupLen,
+                                                                                              itemBuilder: (context, index) {
+                                                                                                return menuItemBuilder(index, context, cubit, state);
+                                                                                              },
+                                                                                              separatorBuilder: (context, index) {
+                                                                                                return SizedBox(
+                                                                                                  width: 10,
+                                                                                                );
+                                                                                              }),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ),
+                                                                                  margin: EdgeInsets.only(bottom: 50, left: 12, right: 12),
+                                                                                  decoration: BoxDecoration(
+                                                                                    color: Colors.white,
+                                                                                    borderRadius: BorderRadius.circular(40),
+                                                                                  ),
+                                                                                ),
+                                                                              );
+                                                                            },
+                                                                            transitionBuilder: (_,
+                                                                                anim,
+                                                                                __,
+                                                                                child) {
+                                                                              return SlideTransition(
+                                                                                position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
+                                                                                child: child,
+                                                                              );
+                                                                            },
+                                                                          );
+                                                                        }),
+                                                              ),
+                                                            ),
+                                                          ]),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                          color: Colors.orange,
+                                                        ),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(5.0),
+                                                          child: ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8.0),
+                                                              child: Container(
+                                                                height: 150,
+                                                                child: Center(
+                                                                  child: Image
+                                                                      .asset(
+                                                                          'images/avatar.png'),
+                                                                ),
+                                                              )),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
+                                              )
+                                      ],
+                                    ),
+                                  )),
+                          ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    state is GetGroupDataLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : Container(
+                            child: cubit.groupLen == 0
+                                ? Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(
-                                        Icons.label_off,
+                                        Icons.event_note_sharp,
                                         color: Colors.grey,
-                                        size: 80,
-                                      ),
-                                      SizedBox(
-                                        height: 10,
+                                        size: 100,
                                       ),
                                       Text(
-                                        "No ID yet",
+                                        "no groups yet",
                                         style: TextStyle(
                                             color: Colors.grey,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 18),
                                       )
                                     ],
-                                  )),
-                            )
-                          : Container(
-                              child: cubit.currentUserState != "notfound"
-                                  ? Container(
-                                      decoration: BoxDecoration(
-                                          border:
-                                              Border.all(color: Colors.orange),
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5.0),
-                                            child: Text(
-                                              'Last Scan',
-                                              style: TextStyle(
-                                                  color: customGray,
-                                                  fontSize: 35,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                          state is FireDataGetting ||
-                                                  cubit.groupsExist == false
-                                              ? Container(
-                                                  width: double.infinity,
-                                                  height: 180,
-                                                  child:
-                                                      CupertinoActivityIndicator(
-                                                    radius: 20,
-                                                  ),
-                                                )
-                                              : Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: Column(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Center(
-                                                                child: Text(
-                                                                  '${cubit.lastUserName}',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .orange,
-                                                                      fontSize:
-                                                                          20,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold),
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                height: 10,
-                                                              ),
-                                                              Text(
-                                                                  'Group : ${cubit.groupNames[cubit.lastUserGroupIndex - 1]}'),
-                                                              SizedBox(
-                                                                height: 5,
-                                                              ),
-                                                              Text(
-                                                                  'ID : ${cubit.currentUserId}'),
-                                                              SizedBox(
-                                                                height: 5,
-                                                              ),
-                                                              cubit.currentUserState ==
-                                                                      "new"
-                                                                  ? Wrap(
-                                                                      crossAxisAlignment:
-                                                                          WrapCrossAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        Text(
-                                                                          'not Registered ',
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            color:
-                                                                                Colors.red,
-                                                                          ),
-                                                                        ),
-                                                                        Icon(
-                                                                          Icons
-                                                                              .error_outline,
-                                                                          color:
-                                                                              Colors.red,
-                                                                        )
-                                                                      ],
-                                                                    )
-                                                                  : Row(
-                                                                      children: [
-                                                                        Text(
-                                                                          'Process completed',
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            color:
-                                                                                Colors.green,
-                                                                          ),
-                                                                        ),
-                                                                        Icon(
-                                                                          Icons
-                                                                              .check,
-                                                                          color:
-                                                                              Colors.green,
-                                                                        )
-                                                                      ],
-                                                                    ),
-                                                            ]),
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: Container(
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8),
-                                                            color:
-                                                                Colors.orange,
-                                                          ),
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(5.0),
-                                                            child: ClipRRect(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            8.0),
-                                                                child: FadeInImage
-                                                                    .assetNetwork(
-                                                                  placeholder:
-                                                                      'images/avatar.png',
-                                                                  imageErrorBuilder:
-                                                                      (
-                                                                    context,
-                                                                    error,
-                                                                    stackTrace,
-                                                                  ) {
-                                                                    return Container(
-                                                                      height:
-                                                                          180,
-                                                                      child:
-                                                                          Center(
-                                                                        child: Image.asset(
-                                                                            'images/avatar.png'),
-                                                                      ),
-                                                                    );
-                                                                  },
-                                                                  image:
-                                                                      '${cubit.currentUserGroupImageUrl}',
-                                                                )),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ],
-                                                )
-                                        ],
-                                      ),
-                                    )
-                                  : Container(
-                                      child: Container(
-                                      decoration: BoxDecoration(
-                                          border:
-                                              Border.all(color: Colors.orange),
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5.0),
-                                            child: Text(
-                                              'Last Scan',
-                                              style: TextStyle(
-                                                  color: customGray,
-                                                  fontSize: 35,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                          state is FireDataGetting ||
-                                                  cubit.groupsExist == false
-                                              ? Container(
-                                                  width: double.infinity,
-                                                  height: 150,
-                                                  child:
-                                                      CupertinoActivityIndicator(
-                                                    radius: 20,
-                                                  ),
-                                                )
-                                              : Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: Column(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Center(
-                                                                child: Text(
-                                                                  'User doesn\'t exist',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .red,
-                                                                      fontSize:
-                                                                          18,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold),
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                height: 10,
-                                                              ),
-                                                              SizedBox(
-                                                                height: 5,
-                                                              ),
-                                                              Text(
-                                                                'ID : ${cubit.currentUserId}',
-                                                                style: TextStyle(
-                                                                    color:
-                                                                        customGray,
-                                                                    fontSize:
-                                                                        15,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              ),
-                                                              SizedBox(
-                                                                height: 5,
-                                                              ),
-                                                              Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .all(
-                                                                        15.0),
-                                                                child: Center(
-                                                                  child: TextButton(
-                                                                      child: Text("Add the user", style: TextStyle(color: Colors.green, fontSize: 15)),
-                                                                      style: ButtonStyle(padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(15)), foregroundColor: MaterialStateProperty.all<Color>(Colors.lightGreen), shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0), side: BorderSide(color: Colors.green)))),
-                                                                      onPressed: () {
-                                                                        showGeneralDialog(
-                                                                          barrierLabel:
-                                                                              "Barrier",
-                                                                          barrierDismissible:
-                                                                              true,
-                                                                          barrierColor: Colors
-                                                                              .black
-                                                                              .withOpacity(0.5),
-                                                                          transitionDuration:
-                                                                              Duration(milliseconds: 700),
-                                                                          context:
-                                                                              context,
-                                                                          pageBuilder: (_,
-                                                                              __,
-                                                                              ___) {
-                                                                            return Align(
-                                                                              alignment: Alignment.bottomCenter,
-                                                                              child: Container(
-                                                                                height: 200,
-                                                                                child: Padding(
-                                                                                  padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                                                                                  child: Column(
-                                                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                                                    children: [
-                                                                                      Text(
-                                                                                        'Adding the user to sheet ',
-                                                                                        style: TextStyle(decoration: TextDecoration.none, fontSize: 18, color: Colors.orange),
-                                                                                      ),
-                                                                                      SizedBox(
-                                                                                        height: 10,
-                                                                                      ),
-                                                                                      Text(
-                                                                                        'step 1 : choose the group',
-                                                                                        style: TextStyle(decoration: TextDecoration.none, fontSize: 15, color: customGray),
-                                                                                      ),
-                                                                                      Expanded(
-                                                                                        child: ListView.separated(
-                                                                                            scrollDirection: Axis.horizontal,
-                                                                                            itemCount: cubit.groupLen,
-                                                                                            itemBuilder: (context, index) {
-                                                                                              return menuItemBuilder(index, context, cubit, state);
-                                                                                            },
-                                                                                            separatorBuilder: (context, index) {
-                                                                                              return SizedBox(
-                                                                                                width: 10,
-                                                                                              );
-                                                                                            }),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                ),
-                                                                                margin: EdgeInsets.only(bottom: 50, left: 12, right: 12),
-                                                                                decoration: BoxDecoration(
-                                                                                  color: Colors.white,
-                                                                                  borderRadius: BorderRadius.circular(40),
-                                                                                ),
-                                                                              ),
-                                                                            );
-                                                                          },
-                                                                          transitionBuilder: (_,
-                                                                              anim,
-                                                                              __,
-                                                                              child) {
-                                                                            return SlideTransition(
-                                                                              position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
-                                                                              child: child,
-                                                                            );
-                                                                          },
-                                                                        );
-                                                                      }),
-                                                                ),
-                                                              ),
-                                                            ]),
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: Container(
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8),
-                                                            color:
-                                                                Colors.orange,
-                                                          ),
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(5.0),
-                                                            child: ClipRRect(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            8.0),
-                                                                child:
-                                                                    Container(
-                                                                  height: 150,
-                                                                  child: Center(
-                                                                    child: Image
-                                                                        .asset(
-                                                                            'images/avatar.png'),
-                                                                  ),
-                                                                )),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ],
-                                                )
-                                        ],
-                                      ),
-                                    )),
-                            ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Expanded(
-                        child: state is GetGroupDataLoading
-                            ? Center(child: CircularProgressIndicator())
-                            : Container(
-                                child: cubit.groupLen == 0
-                                    ? Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.event_note_sharp,
-                                            color: Colors.grey,
-                                            size: 100,
-                                          ),
-                                          Text(
-                                            "no groups yet",
-                                            style: TextStyle(
-                                                color: Colors.grey,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 18),
-                                          )
-                                        ],
-                                      )
-                                    : ListView.separated(
-                                        itemCount: cubit.groupLen,
-                                        itemBuilder: (context, index) {
-                                          return groupItemBuilder(
-                                              index, context, cubit, state);
-                                        },
-                                        separatorBuilder: (context, index) {
-                                          return SizedBox(
-                                            height: 10,
-                                          );
-                                        }),
-                              ),
-                      )
-                    ],
-                  ),
-                )));
+                                  )
+                                : ListView.separated(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: cubit.groupLen,
+                                    itemBuilder: (context, index) {
+                                      return groupItemBuilder(
+                                          index, context, cubit, state);
+                                    },
+                                    separatorBuilder: (context, index) {
+                                      return SizedBox(
+                                        height: 10,
+                                      );
+                                    }),
+                          )
+                  ],
+                ),
+              ),
+            ));
       },
     );
   }

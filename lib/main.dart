@@ -23,7 +23,6 @@ Future<void> main() async {
 
 // ignore: must_be_immutable
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   bool isHere;
   MyApp(this.isHere);
   @override

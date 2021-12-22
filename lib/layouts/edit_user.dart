@@ -15,6 +15,7 @@ class EditUserScreen extends StatelessWidget {
   String id;
   int groupIndex;
   bool dataHere;
+  bool dataWritten = true;
 
   EditUserScreen(this.id, this.groupIndex, this.dataHere);
   // id
@@ -141,7 +142,7 @@ class EditUserScreen extends StatelessWidget {
                           child: ListView.separated(
                               itemCount: cubit.activeGroupColumns.length,
                               itemBuilder: (context, index) {
-                                return inputBuilder(index, cubit);
+                                return inputBuilder(index, cubit, state);
                               },
                               separatorBuilder: (context, index) {
                                 return SizedBox(
@@ -158,9 +159,12 @@ class EditUserScreen extends StatelessWidget {
     );
   }
 
-  Widget inputBuilder(int index, AppCubit cubit) {
-    cubit.editUserController.add(TextEditingController());
-    print('index $index');
+  Widget inputBuilder(int index, AppCubit cubit, AppStates state) {
+    if (cubit.editUserController.length < cubit.activeGroupColumns.length) {
+      cubit.editUserController.add(TextEditingController());
+      print(cubit.editUserController.length);
+      print('index $index');
+    }
 
     if (cubit.activeGroupColumns[index].contains('/')) {
       return Container();
@@ -172,9 +176,11 @@ class EditUserScreen extends StatelessWidget {
     }
 
     print(cubit.userData);
-    if (dataHere) {
+    if ((dataHere && dataWritten) || state is GetGroupPersonDone) {
       cubit.editUserController[index].text =
           cubit.userData.values.toList()[index];
+      dataWritten = false;
+      cubit.emit(GetGroupPersonError());
     }
     return TextFormField(
         controller: cubit.editUserController[index],
