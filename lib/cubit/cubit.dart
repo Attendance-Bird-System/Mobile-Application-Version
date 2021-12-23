@@ -529,14 +529,19 @@ class AppCubit extends Cubit<AppStates> {
 
   void sendToEsp(BuildContext context, String wifiName, String wifiPassword) {
     emit(SendToEspLoading());
+    wifiPassword = wifiPassword.replaceAll("#", "%23");
+    wifiPassword = wifiPassword.replaceAll("&", "%26");
+    wifiPassword = wifiPassword.replaceAll("\$", "%24");
+    wifiPassword = wifiPassword.replaceAll(" ", "%23");
+
+    wifiName = wifiName.replaceAll("#", "%23");
+    wifiName = wifiName.replaceAll("&", "%26");
+    wifiName = wifiName.replaceAll("\$", "%24");
+    wifiName = wifiName.replaceAll(" ", "%23");
     var url = Uri.parse(
         'http://192.168.4.1/data?user=$phone&wifi=$wifiName&pass=$wifiPassword');
-    http.read(url).catchError((e) {
-      errDialog(
-          "Error happened ,make sure you connect to ESP wifi and try again");
-      print(e);
-      emit(SendToEspError());
-    }).then((value) {
+    print(url);
+    http.read(url).then((value) {
       if (value.trim() != "Failed") {
         navigateAndReplace(context, MainScreen());
         emit(SendToEspDone());
@@ -544,6 +549,11 @@ class AppCubit extends Cubit<AppStates> {
         errDialog("Error happened ,make sure Your WIFI and pass is correct ");
         emit(SendToEspError());
       }
+    }).catchError((e) {
+      errDialog(
+          "Error happened ,make sure you connect to ESP wifi and try again");
+      print(e);
+      emit(SendToEspError());
     });
   }
 
