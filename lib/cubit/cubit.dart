@@ -84,6 +84,47 @@ class AppCubit extends Cubit<AppStates> {
   String currentUserGroupImageUrl = "";
   StreamSubscription? listener;
 
+  void deleteGroup(int groupIndex, BuildContext context) {
+    emit(DeleteGroupLoading());
+    Navigator.of(context).pop();
+    dataBase.child(phone).child("Groups").once().then((snap) {
+      var doc = snap.value;
+      Map<String, String> newData = {};
+      groupLen--;
+      groupNames.removeAt(groupIndex - 1);
+      doc.remove('g$groupIndex');
+      int i = 0;
+      for (String val in doc.values) {
+        i++;
+        newData['g$i'] = val;
+      }
+      dataBase.child(phone).update({"nGroups": groupLen, "Groups": newData});
+      print(newData);
+      emit(DeleteGroupDone());
+    }).catchError((err) {
+      errDialog("An error happened while deleting The group");
+      emit(DeleteGroupError());
+    });
+  }
+
+  void deleteUser(int userIndex, int groupIndex, BuildContext context) {
+    emit(DeletePersonLoading());
+    var url = Uri.parse(
+        "https://script.google.com/macros/s/AKfycbxx3WO2ZZQ0jSInhHwsl6p3ZvnM4NAVP-ka0ecbqkZJRnOlj8G7qTyvZcZdknsQGvk/exec?" +
+            "fun=remove&group=$groupIndex&person_id=$userIndex&userName=$phone");
+    print(url);
+    http.read(url).then((value) {
+      print(value);
+      emit(DeletePersonDone());
+      navigateAndReplace(context, MainScreen());
+      activeGroup = 0;
+    }).catchError((onError) {
+      errDialog("Error at deleting");
+      emit(DeletePersonError());
+      print(onError);
+    });
+  }
+
   void getFireData() {
     emit(FireDataGetting());
     print("fire data");
@@ -107,6 +148,7 @@ class AppCubit extends Cubit<AppStates> {
     }).then((value) {
       emit(FireDataGot());
     });
+    print("hehe iam listening");
     listener = dataBase.child(this.phone).onChildChanged.listen((event) {
       emit(FireDataGetting());
       DataSnapshot snap = event.snapshot;
@@ -209,15 +251,21 @@ class AppCubit extends Cubit<AppStates> {
       userImageUrl = "";
       for (var v in userData.values) {
         if (v.contains('drive.google.com')) {
-          userImageUrl =
-              "https://drive.google.com/uc?export=view&id=" + v.split('/')[5];
+          print(v);
+          if (v.contains('id')) {
+            userImageUrl = v.toString();
+          } else {
+            try {
+              userImageUrl = "https://drive.google.com/uc?export=view&id=" +
+                  v.split('/')[5];
+            } catch (err) {
+              print(err);
+            }
+          }
         }
       }
       navigateAndPush(context, UserScreen(userIndex, groupIndex));
       emit(GetGroupPersonDone());
-    }).catchError((onError) {
-      emit(GetGroupPersonError());
-      print(onError);
     });
   }
 
@@ -379,7 +427,7 @@ class AppCubit extends Cubit<AppStates> {
       currentColumnToFill++;
       emit(ColumnPlusOne());
     } else {
-      errDialog(context, "You name all column click the create button", 4);
+      errDialog("You name all column click the create button");
     }
   }
 
@@ -424,15 +472,13 @@ class AppCubit extends Cubit<AppStates> {
             id);
     http.read(url).catchError((err) {
       print(err);
-      errDialog(
-          context, "Error happened while reading the data please try again", 2);
+      errDialog("Error happened while reading the data please try again");
       emit(TestLinkError());
     }).then((value) {
       if (value.trim() == '-1') {
         errDialog(
-            context,
-            "Invalid sheet please make sure that the url is public and editor",
-            4);
+          "Invalid sheet please make sure that the url is public and editor",
+        );
         emit(TestLinkError());
       } else {
         // Link Is Ok
@@ -455,16 +501,13 @@ class AppCubit extends Cubit<AppStates> {
       http.read(url).catchError((err) {
         print(err);
         useSheetRowAsName = !useSheetRowAsName;
-        errDialog(context,
-            "Error happened while reading the data please try again", 2);
+        errDialog("Error happened while reading the data please try again");
         emit(UseSheetRowAsNameError());
       }).then((value) {
         if (value.trim() == '-1') {
           useSheetRowAsName = !useSheetRowAsName;
           errDialog(
-              context,
-              "Invalid sheet please make sure that the url is public and editor",
-              2);
+              "Invalid sheet please make sure that the url is public and editor");
           emit(UseSheetRowAsNameError());
         } else {
           createTable(value);
@@ -489,8 +532,8 @@ class AppCubit extends Cubit<AppStates> {
     var url = Uri.parse(
         'http://192.168.4.1/data?user=$phone&wifi=$wifiName&pass=$wifiPassword');
     http.read(url).catchError((e) {
-      errDialog(context,
-          "Error happened ,make sure you connect to ESP wifi and try again", 2);
+      errDialog(
+          "Error happened ,make sure you connect to ESP wifi and try again");
       print(e);
       emit(SendToEspError());
     }).then((value) {
@@ -498,8 +541,7 @@ class AppCubit extends Cubit<AppStates> {
         navigateAndReplace(context, MainScreen());
         emit(SendToEspDone());
       } else {
-        errDialog(context,
-            "Error happened ,make sure Your WIFI and pass is correct ", 4);
+        errDialog("Error happened ,make sure Your WIFI and pass is correct ");
         emit(SendToEspError());
       }
     });
@@ -532,7 +574,7 @@ class AppCubit extends Cubit<AppStates> {
 
     if (doc != null) {
       emit(UserSignUpError());
-      errDialog(context, "Sorry user name already exist", 2);
+      errDialog("Sorry user name already exist");
     } else {
       dataBase.child(phone).update({
         'userNumber': phoneNumber,
@@ -563,7 +605,7 @@ class AppCubit extends Cubit<AppStates> {
         emit(UserValidateDone());
       }
     }).catchError((error) {
-      errDialog(context, "Wrong OTP", 2);
+      errDialog("Wrong OTP");
       emit(UserValidateError());
     });
   }
@@ -579,7 +621,7 @@ class AppCubit extends Cubit<AppStates> {
             verificationFailed: (value) {
               validateNumberForFirst = false;
               emit(UserSignUpError());
-              errDialog(context, "Enter a valid number", 2);
+              errDialog("Enter a valid number");
             },
             codeSent: (String verificationId, [code]) {
               validateNumberForFirst = true;
@@ -606,7 +648,6 @@ class AppCubit extends Cubit<AppStates> {
     });
   }
 
-  // get data from the shared preferences to login .....
   void getUserLoginData(bool isHere) async {
     emit(CheckUserStateLoading());
     final prefs = await SharedPreferences.getInstance();
@@ -618,7 +659,6 @@ class AppCubit extends Cubit<AppStates> {
     emit(CheckUserStateDone());
   }
 
-  // get the phone and password to login
   void userLogIn(BuildContext context, String phone, String pass) async {
     this.phone = phone;
     emit(UserLogInLoading());
@@ -630,11 +670,11 @@ class AppCubit extends Cubit<AppStates> {
         saveData(phone);
         navigateAndReplace(context, MainScreen());
       } else {
-        errDialog(context, "Wrong Password", 2);
+        errDialog("Wrong Password");
         emit(UserLogInError());
       }
     } else {
-      errDialog(context, "user doesn't exist", 2);
+      errDialog("user doesn't exist");
       emit(UserLogInError());
     }
   }
@@ -650,7 +690,7 @@ class AppCubit extends Cubit<AppStates> {
         navigateAndReplace(context, ChangePassword());
       }
     }).catchError((error) {
-      errDialog(context, "Wrong OTP", 2);
+      errDialog("Wrong OTP");
       emit(UserValidateError());
     });
   }
@@ -683,7 +723,7 @@ class AppCubit extends Cubit<AppStates> {
         emit(UserValidateDone());
       });
     } else {
-      errDialog(context, "User doesn't exist", 2);
+      errDialog("User doesn't exist");
       emit(UserValidateError());
     }
   }

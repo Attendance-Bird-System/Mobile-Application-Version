@@ -37,23 +37,40 @@ class UserScreen extends StatelessWidget {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     cubit.editUserController = [];
                     return EditUserScreen(
-                        cubit.userData['ID'], groupIndex, true);
+                        cubit.userData['ID'] ?? '-', groupIndex, true);
                   }));
                 }
               }),
           appBar: AppBar(
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(15),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(15),
+                ),
               ),
-            ),
-            title: Text(
-              'User Information',
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-          ),
+              title: Text(
+                'User Information',
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              actions: [
+                IconButton(
+                  icon: state is DeletePersonLoading
+                      ? CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : Icon(Icons.restore_from_trash_outlined),
+                  onPressed: () {
+                    //print(userIndex);
+                    customCupertinoDialog(context,
+                        title: "Warning",
+                        content: "Are you sure you want to delete user ",
+                        yesFunction: () {
+                      cubit.deleteUser(userIndex + 2, groupIndex, context);
+                    });
+                  },
+                )
+              ]),
           body: state is GetGroupPersonLoading
               ? Center(child: CircularProgressIndicator())
               : Padding(
@@ -121,7 +138,7 @@ class UserScreen extends StatelessWidget {
             child: Text(
               cubit.userData['Name'] == null
                   ? "-"
-                  : cubit.userData['Name'].toString().toUpperCase(),
+                  : cubit.userData['Name'].toString(),
               style: TextStyle(
                   color: Colors.orange,
                   fontSize: 20,

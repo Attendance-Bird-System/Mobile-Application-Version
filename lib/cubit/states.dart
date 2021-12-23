@@ -113,3 +113,15 @@ class SendToEditDone extends AppStates {}
 class AddGroupState extends AppStates {}
 
 class AddUserState extends AppStates {}
+
+class DeletePersonLoading extends AppStates {}
+
+class DeletePersonError extends AppStates {}
+
+class DeletePersonDone extends AppStates {}
+
+class DeleteGroupLoading extends AppStates {}
+
+class DeleteGroupError extends AppStates {}
+
+class DeleteGroupDone extends AppStates {}

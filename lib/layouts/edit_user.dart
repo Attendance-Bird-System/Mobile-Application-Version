@@ -83,7 +83,9 @@ class EditUserScreen extends StatelessWidget {
                             this.typeAheadController.text;
                       } else if (cubit.activeGroupColumns[i].trim() != 'ID') {
                         dataToSent[cubit.activeGroupColumns[i]] =
-                            cubit.editUserController[i].text;
+                            cubit.editUserController[i].text.isEmpty
+                                ? "Empty"
+                                : cubit.editUserController[i].text;
                       }
                     }
                   }
@@ -167,6 +169,7 @@ class EditUserScreen extends StatelessWidget {
     }
 
     if (cubit.activeGroupColumns[index].contains('/')) {
+      // photo
       return Container();
     }
 
