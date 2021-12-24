@@ -532,12 +532,12 @@ class AppCubit extends Cubit<AppStates> {
     wifiPassword = wifiPassword.replaceAll("#", "%23");
     wifiPassword = wifiPassword.replaceAll("&", "%26");
     wifiPassword = wifiPassword.replaceAll("\$", "%24");
-    wifiPassword = wifiPassword.replaceAll(" ", "%23");
+    wifiPassword = wifiPassword.replaceAll(" ", "%20");
 
     wifiName = wifiName.replaceAll("#", "%23");
     wifiName = wifiName.replaceAll("&", "%26");
     wifiName = wifiName.replaceAll("\$", "%24");
-    wifiName = wifiName.replaceAll(" ", "%23");
+    wifiName = wifiName.replaceAll(" ", "%20");
     var url = Uri.parse(
         'http://192.168.4.1/data?user=$phone&wifi=$wifiName&pass=$wifiPassword');
     print(url);
