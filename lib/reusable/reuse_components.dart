@@ -1,10 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
-Color customGray = Color.fromRGBO(64, 64, 64, 1);
-
-void customCupertinoDialog(
+void customChoiceDialog(
   BuildContext context, {
   required String title,
   required String content,
@@ -37,31 +33,6 @@ void customCupertinoDialog(
                   )),
             ],
           ));
-}
-
-void errDialog(String message) {
-  Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
-      fontSize: 16.0);
-}
-
-void navigateAndReplace(BuildContext context, Widget newScreen) {
-  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-    return newScreen;
-  }));
-}
-
-void navigateAndPush(BuildContext context, Widget newScreen) {
-  Navigator.push(context, MaterialPageRoute(
-    builder: (context) {
-      return newScreen;
-    },
-  ));
 }
 
 Widget upperTriangle(BuildContext context) {

@@ -1,9 +1,7 @@
 import 'package:auto_id/cubit/cubit.dart';
 import 'package:auto_id/cubit/states.dart';
-import 'package:auto_id/reusable/reuse_components.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:auto_id/view/resources/color_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
@@ -56,7 +54,7 @@ class EditUserScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: customGray,
+                      color: ColorManager.darkGrey,
                     ),
                   ),
                 ),
@@ -128,8 +126,8 @@ class EditUserScreen extends StatelessWidget {
                             labelText: "Name",
                             prefixIcon: Icon(Icons.person),
                             enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: customGray, width: 2.0),
+                              borderSide: BorderSide(
+                                  color: ColorManager.darkGrey, width: 2.0),
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           )),
@@ -183,6 +181,7 @@ class EditUserScreen extends StatelessWidget {
       cubit.editUserController[index].text =
           cubit.userData.values.toList()[index];
       dataWritten = false;
+      // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
       cubit.emit(GetGroupPersonError());
     }
     return TextFormField(

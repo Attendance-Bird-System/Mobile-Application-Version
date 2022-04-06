@@ -1,14 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:auto_id/layouts/User_screen.dart';
-import 'package:auto_id/layouts/add_group.dart';
-import '../layouts/sign_pages/change_password.dart';
-import 'package:auto_id/layouts/edit_user.dart';
-import 'package:auto_id/layouts/group_screen.dart';
-import '../layouts/sign_pages/login_page.dart';
-import 'package:auto_id/layouts/main_screen.dart';
-import 'package:auto_id/reusable/reuse_components.dart';
-import 'package:bloc/bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -19,6 +10,15 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import '../shared/functions/navigation_functions.dart';
+import '../shared/widgets/toast_helper.dart';
+import '../view/User_screen.dart';
+import '../view/add_group.dart';
+import '../view/edit_user.dart';
+import '../view/group_screen.dart';
+import '../view/main_screen.dart';
+import '../view/sign_pages/change_password.dart';
+import '../view/sign_pages/login_page.dart';
 import 'states.dart';
 
 class AppCubit extends Cubit<AppStates> {
@@ -36,7 +36,7 @@ class AppCubit extends Cubit<AppStates> {
   String phone = "";
   bool validateNumberForFirst = false;
   bool userISoK = false;
-  final dataBase = FirebaseDatabase.instance.reference();
+  final dataBase = FirebaseDatabase.instance.ref();
   int addIndex = 0;
   bool useSheetRowAsName = true;
   List<DataColumn> tableNameColumns = [];
@@ -82,13 +82,14 @@ class AppCubit extends Cubit<AppStates> {
   String lastUserName = "";
   int lastUserGroupIndex = 0;
   String currentUserGroupImageUrl = "";
+  // ignore: cancel_subscriptions
   StreamSubscription? listener;
 
   void deleteGroup(int groupIndex, BuildContext context) {
     emit(DeleteGroupLoading());
     Navigator.of(context).pop();
-    dataBase.child(phone).child("Groups").once().then((snap) {
-      var doc = snap.value;
+    dataBase.child(phone).child("Groups").get().then((DataSnapshot snap) {
+      dynamic doc = snap.value;
       Map<String, String> newData = {};
       groupLen--;
       groupNames.removeAt(groupIndex - 1);
@@ -102,7 +103,7 @@ class AppCubit extends Cubit<AppStates> {
       print(newData);
       emit(DeleteGroupDone());
     }).catchError((err) {
-      errDialog("An error happened while deleting The group");
+      showToast("An error happened while deleting The group");
       emit(DeleteGroupError());
     });
   }
@@ -119,7 +120,7 @@ class AppCubit extends Cubit<AppStates> {
       navigateAndReplace(context, MainScreen());
       activeGroup = 0;
     }).catchError((onError) {
-      errDialog("Error at deleting");
+      showToast("Error at deleting");
       emit(DeletePersonError());
       print(onError);
     });
@@ -128,11 +129,12 @@ class AppCubit extends Cubit<AppStates> {
   void getFireData() {
     emit(FireDataGetting());
     print("fire data");
-    dataBase.child(phone).once().then((snap) {
-      this.currentUserId = "${snap.value['lastID'].split(',')[0]}";
-      this.currentUserState = "${snap.value['lastID'].split(',')[1]}";
+    dataBase.child(phone).get().then((DataSnapshot snap) {
+      dynamic doc = snap.value;
+      this.currentUserId = "${doc['lastID'].split(',')[0]}";
+      this.currentUserState = "${doc.split(',')[1]}";
 
-      var data = snap.value['data'].split(',');
+      var data = doc['data'].split(',');
       var temp = '';
       if (data[0].toString().isNotEmpty) {
         temp = data[0].substring(1, data[0].toString().length);
@@ -154,12 +156,12 @@ class AppCubit extends Cubit<AppStates> {
       DataSnapshot snap = event.snapshot;
       switch (snap.key) {
         case "lastID":
-          this.currentUserId = "${snap.value.split(',')[0]}";
-          this.currentUserState = "${snap.value.split(',')[1]}";
+          this.currentUserId = "${snap.value.toString().split(',')[0]}";
+          this.currentUserState = "${snap.value.toString().split(',')[1]}";
           emit(FireDataGot());
           break;
         case "data":
-          var data = snap.value.split(',');
+          var data = snap.value.toString().split(',');
           if (data[0].toString().isNotEmpty) {
             var temp = data[0].substring(1, data[0].toString().length);
             if (temp.toString().isNotEmpty)
@@ -181,8 +183,9 @@ class AppCubit extends Cubit<AppStates> {
 
   void getGroupLink(BuildContext context) {
     emit(GetGroupLinkLoading());
-    dataBase.child(phone).child('Groups').once().then((value) {
-      var id = value.value['g$activeGroup'].split(',')[0];
+    dataBase.child(phone).child('Groups').get().then((DataSnapshot value) {
+      dynamic doc = value.value;
+      var id = doc['g$activeGroup'].split(',')[0];
       Clipboard.setData(ClipboardData(
           text: "https://docs.google.com/spreadsheets/d/" +
               id +
@@ -351,12 +354,12 @@ class AppCubit extends Cubit<AppStates> {
     emit(GetGroupDataLoading());
     print("phone $phone");
     if (phone.isNotEmpty) {
-      dataBase.child(phone).once().then((snap) {
-        var doc = snap.value;
+      dataBase.child(phone).get().then((snap) {
+        dynamic doc = snap.value;
         print(doc);
         groupLen = doc['nGroups'];
-        dataBase.child(phone).child("Groups").once().then((snap) {
-          doc = snap.value;
+        dataBase.child(phone).child("Groups").get().then((snap) {
+          dynamic doc = snap.value;
           groupNames = [];
           for (int i = 1; i <= groupLen; i++) {
             groupNames.add(doc['g$i'].split(',')[1]);
@@ -427,7 +430,8 @@ class AppCubit extends Cubit<AppStates> {
       currentColumnToFill++;
       emit(ColumnPlusOne());
     } else {
-      errDialog("You name all column click the create button");
+      showToast("You name all column click the create button",
+          type: ToastType.info);
     }
   }
 
@@ -472,11 +476,11 @@ class AppCubit extends Cubit<AppStates> {
             id);
     http.read(url).catchError((err) {
       print(err);
-      errDialog("Error happened while reading the data please try again");
+      showToast("Error happened while reading the data please try again");
       emit(TestLinkError());
     }).then((value) {
       if (value.trim() == '-1') {
-        errDialog(
+        showToast(
           "Invalid sheet please make sure that the url is public and editor",
         );
         emit(TestLinkError());
@@ -501,12 +505,12 @@ class AppCubit extends Cubit<AppStates> {
       http.read(url).catchError((err) {
         print(err);
         useSheetRowAsName = !useSheetRowAsName;
-        errDialog("Error happened while reading the data please try again");
+        showToast("Error happened while reading the data please try again");
         emit(UseSheetRowAsNameError());
       }).then((value) {
         if (value.trim() == '-1') {
           useSheetRowAsName = !useSheetRowAsName;
-          errDialog(
+          showToast(
               "Invalid sheet please make sure that the url is public and editor");
           emit(UseSheetRowAsNameError());
         } else {
@@ -546,11 +550,11 @@ class AppCubit extends Cubit<AppStates> {
         navigateAndReplace(context, MainScreen());
         emit(SendToEspDone());
       } else {
-        errDialog("Error happened ,make sure Your WIFI and pass is correct ");
+        showToast("Error happened ,make sure Your WIFI and pass is correct ");
         emit(SendToEspError());
       }
     }).catchError((e) {
-      errDialog(
+      showToast(
           "Error happened ,make sure you connect to ESP wifi and try again");
       print(e);
       emit(SendToEspError());
@@ -579,12 +583,12 @@ class AppCubit extends Cubit<AppStates> {
     emit(UserSignUpLoading());
     // write data
 
-    DataSnapshot snapshot = await dataBase.child(phone).once();
+    DataSnapshot snapshot = await dataBase.child(phone).get();
     var doc = snapshot.value;
 
     if (doc != null) {
       emit(UserSignUpError());
-      errDialog("Sorry user name already exist");
+      showToast("Sorry user name already exist");
     } else {
       dataBase.child(phone).update({
         'userNumber': phoneNumber,
@@ -615,7 +619,7 @@ class AppCubit extends Cubit<AppStates> {
         emit(UserValidateDone());
       }
     }).catchError((error) {
-      errDialog("Wrong OTP");
+      showToast("Wrong OTP");
       emit(UserValidateError());
     });
   }
@@ -631,7 +635,7 @@ class AppCubit extends Cubit<AppStates> {
             verificationFailed: (value) {
               validateNumberForFirst = false;
               emit(UserSignUpError());
-              errDialog("Enter a valid number");
+              showToast("Enter a valid number");
             },
             codeSent: (String verificationId, [code]) {
               validateNumberForFirst = true;
@@ -673,18 +677,18 @@ class AppCubit extends Cubit<AppStates> {
     this.phone = phone;
     emit(UserLogInLoading());
 
-    DataSnapshot snapshot = await dataBase.child(phone).once();
-    var doc = snapshot.value;
+    DataSnapshot snapshot = await dataBase.child(phone).get();
+    dynamic doc = snapshot.value;
     if (doc != null) {
       if (pass == '${doc['Password']}') {
         saveData(phone);
         navigateAndReplace(context, MainScreen());
       } else {
-        errDialog("Wrong Password");
+        showToast("Wrong Password");
         emit(UserLogInError());
       }
     } else {
-      errDialog("user doesn't exist");
+      showToast("user doesn't exist");
       emit(UserLogInError());
     }
   }
@@ -700,7 +704,7 @@ class AppCubit extends Cubit<AppStates> {
         navigateAndReplace(context, ChangePassword());
       }
     }).catchError((error) {
-      errDialog("Wrong OTP");
+      showToast("Wrong OTP");
       emit(UserValidateError());
     });
   }
@@ -709,8 +713,8 @@ class AppCubit extends Cubit<AppStates> {
     this.phone = phone;
     emit(UserValidateLoading());
 
-    DataSnapshot snapshot = await dataBase.child(phone).once();
-    var doc = snapshot.value;
+    DataSnapshot snapshot = await dataBase.child(phone).get();
+    dynamic doc = snapshot;
     await Firebase.initializeApp();
     _auth = FirebaseAuth.instance;
 
@@ -733,7 +737,7 @@ class AppCubit extends Cubit<AppStates> {
         emit(UserValidateDone());
       });
     } else {
-      errDialog("User doesn't exist");
+      showToast("User doesn't exist");
       emit(UserValidateError());
     }
   }

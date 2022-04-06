@@ -1,21 +1,15 @@
 import 'package:auto_id/cubit/cubit.dart';
 import 'package:auto_id/cubit/states.dart';
-import 'package:auto_id/layouts/esp_config.dart';
-import 'package:auto_id/reusable/reuse_components.dart';
+import 'package:auto_id/view/resources/color_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../shared/functions/navigation_functions.dart';
+import 'esp_config.dart';
 
 // ignore: must_be_immutable
 class MainScreen extends StatelessWidget {
-  MainScreen() {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.orange, // status bar color
-    ));
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AppCubit, AppStates>(
@@ -120,7 +114,7 @@ class MainScreen extends StatelessWidget {
                                           child: Text(
                                             'Last Scan',
                                             style: TextStyle(
-                                                color: customGray,
+                                                color: ColorManager.darkGrey,
                                                 fontSize: 35,
                                                 fontWeight: FontWeight.bold),
                                           ),
@@ -291,196 +285,213 @@ class MainScreen extends StatelessWidget {
                                           child: Text(
                                             'Last Scan',
                                             style: TextStyle(
-                                                color: customGray,
+                                                color: ColorManager.darkGrey,
                                                 fontSize: 35,
                                                 fontWeight: FontWeight.bold),
                                           ),
                                         ),
-                                        state is FireDataGetting ||
-                                                cubit.groupsExist == false
-                                            ? Container(
-                                                width: double.infinity,
-                                                height: 150,
-                                                child:
-                                                    CupertinoActivityIndicator(
-                                                  radius: 20,
-                                                ),
-                                              )
-                                            : Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Center(
-                                                              child: Text(
-                                                                'User doesn\'t exist',
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .red,
-                                                                    fontSize:
-                                                                        18,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              height: 10,
-                                                            ),
-                                                            SizedBox(
-                                                              height: 5,
-                                                            ),
-                                                            Text(
-                                                              'ID : ${cubit.currentUserId}',
-                                                              style: TextStyle(
-                                                                  color:
-                                                                      customGray,
-                                                                  fontSize: 15,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold),
-                                                            ),
-                                                            SizedBox(
-                                                              height: 5,
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .all(
-                                                                      15.0),
-                                                              child: Center(
-                                                                child:
-                                                                    TextButton(
-                                                                        child: Text(
-                                                                            "Add the user",
-                                                                            style: TextStyle(
-                                                                                color: Colors
-                                                                                    .green,
-                                                                                fontSize:
-                                                                                    15)),
-                                                                        style: ButtonStyle(
-                                                                            padding:
-                                                                                MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(15)),
-                                                                            foregroundColor: MaterialStateProperty.all<Color>(Colors.lightGreen),
-                                                                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0), side: BorderSide(color: Colors.green)))),
-                                                                        onPressed: () {
-                                                                          showGeneralDialog(
-                                                                            barrierLabel:
-                                                                                "Barrier",
-                                                                            barrierDismissible:
-                                                                                true,
-                                                                            barrierColor:
-                                                                                Colors.black.withOpacity(0.5),
-                                                                            transitionDuration:
-                                                                                Duration(milliseconds: 700),
-                                                                            context:
-                                                                                context,
-                                                                            pageBuilder: (_,
-                                                                                __,
-                                                                                ___) {
-                                                                              return Align(
-                                                                                alignment: Alignment.bottomCenter,
-                                                                                child: Container(
-                                                                                  height: 200,
-                                                                                  child: Padding(
-                                                                                    padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                                                                                    child: Column(
-                                                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                                                      children: [
-                                                                                        Text(
-                                                                                          'Adding the user to sheet ',
-                                                                                          style: TextStyle(decoration: TextDecoration.none, fontSize: 18, color: Colors.orange),
-                                                                                        ),
-                                                                                        SizedBox(
-                                                                                          height: 10,
-                                                                                        ),
-                                                                                        Text(
-                                                                                          'step 1 : choose the group',
-                                                                                          style: TextStyle(decoration: TextDecoration.none, fontSize: 15, color: customGray),
-                                                                                        ),
-                                                                                        Expanded(
-                                                                                          child: ListView.separated(
-                                                                                              scrollDirection: Axis.horizontal,
-                                                                                              itemCount: cubit.groupLen,
-                                                                                              itemBuilder: (context, index) {
-                                                                                                return menuItemBuilder(index, context, cubit, state);
-                                                                                              },
-                                                                                              separatorBuilder: (context, index) {
-                                                                                                return SizedBox(
-                                                                                                  width: 10,
-                                                                                                );
-                                                                                              }),
-                                                                                        ),
-                                                                                      ],
-                                                                                    ),
-                                                                                  ),
-                                                                                  margin: EdgeInsets.only(bottom: 50, left: 12, right: 12),
-                                                                                  decoration: BoxDecoration(
-                                                                                    color: Colors.white,
-                                                                                    borderRadius: BorderRadius.circular(40),
-                                                                                  ),
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                            transitionBuilder: (_,
-                                                                                anim,
-                                                                                __,
-                                                                                child) {
-                                                                              return SlideTransition(
-                                                                                position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
-                                                                                child: child,
-                                                                              );
-                                                                            },
-                                                                          );
-                                                                        }),
-                                                              ),
-                                                            ),
-                                                          ]),
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(8),
-                                                          color: Colors.orange,
+                                        if (state is FireDataGetting ||
+                                            cubit.groupsExist == false)
+                                          Container(
+                                            width: double.infinity,
+                                            height: 150,
+                                            child: CupertinoActivityIndicator(
+                                              radius: 20,
+                                            ),
+                                          )
+                                        else
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Center(
+                                                          child: Text(
+                                                            'User doesn\'t exist',
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.red,
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
                                                         ),
-                                                        child: Padding(
+                                                        SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        SizedBox(
+                                                          height: 5,
+                                                        ),
+                                                        Text(
+                                                          'ID : ${cubit.currentUserId}',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  ColorManager
+                                                                      .darkGrey,
+                                                              fontSize: 15,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                        SizedBox(
+                                                          height: 5,
+                                                        ),
+                                                        Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                  .all(5.0),
-                                                          child: ClipRRect(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          8.0),
-                                                              child: Container(
-                                                                height: 150,
-                                                                child: Center(
-                                                                  child: Image
-                                                                      .asset(
-                                                                          'images/avatar.png'),
-                                                                ),
-                                                              )),
+                                                                  .all(15.0),
+                                                          child: Center(
+                                                            child: TextButton(
+                                                                child: Text(
+                                                                    "Add the user",
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .green,
+                                                                        fontSize:
+                                                                            15)),
+                                                                style: ButtonStyle(
+                                                                    padding: MaterialStateProperty.all<EdgeInsets>(
+                                                                        EdgeInsets.all(
+                                                                            15)),
+                                                                    foregroundColor:
+                                                                        MaterialStateProperty.all<Color>(Colors
+                                                                            .lightGreen),
+                                                                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
+                                                                        borderRadius: BorderRadius.circular(18.0),
+                                                                        side: BorderSide(color: Colors.green)))),
+                                                                onPressed: () {
+                                                                  showGeneralDialog(
+                                                                    barrierLabel:
+                                                                        "Barrier",
+                                                                    barrierDismissible:
+                                                                        true,
+                                                                    barrierColor: Colors
+                                                                        .black
+                                                                        .withOpacity(
+                                                                            0.5),
+                                                                    transitionDuration:
+                                                                        Duration(
+                                                                            milliseconds:
+                                                                                700),
+                                                                    context:
+                                                                        context,
+                                                                    pageBuilder:
+                                                                        (_, __,
+                                                                            ___) {
+                                                                      return Align(
+                                                                        alignment:
+                                                                            Alignment.bottomCenter,
+                                                                        child:
+                                                                            Container(
+                                                                          height:
+                                                                              200,
+                                                                          child:
+                                                                              Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                                                                            child:
+                                                                                Column(
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                                              children: [
+                                                                                Text(
+                                                                                  'Adding the user to sheet ',
+                                                                                  style: TextStyle(decoration: TextDecoration.none, fontSize: 18, color: Colors.orange),
+                                                                                ),
+                                                                                SizedBox(
+                                                                                  height: 10,
+                                                                                ),
+                                                                                Text(
+                                                                                  'step 1 : choose the group',
+                                                                                  style: TextStyle(decoration: TextDecoration.none, fontSize: 15, color: ColorManager.darkGrey),
+                                                                                ),
+                                                                                Expanded(
+                                                                                  child: ListView.separated(
+                                                                                      scrollDirection: Axis.horizontal,
+                                                                                      itemCount: cubit.groupLen,
+                                                                                      itemBuilder: (context, index) {
+                                                                                        return menuItemBuilder(index, context, cubit, state);
+                                                                                      },
+                                                                                      separatorBuilder: (context, index) {
+                                                                                        return SizedBox(
+                                                                                          width: 10,
+                                                                                        );
+                                                                                      }),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                          margin: EdgeInsets.only(
+                                                                              bottom: 50,
+                                                                              left: 12,
+                                                                              right: 12),
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            color:
+                                                                                Colors.white,
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(40),
+                                                                          ),
+                                                                        ),
+                                                                      );
+                                                                    },
+                                                                    transitionBuilder: (_,
+                                                                        anim,
+                                                                        __,
+                                                                        child) {
+                                                                      return SlideTransition(
+                                                                        position:
+                                                                            Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
+                                                                        child:
+                                                                            child,
+                                                                      );
+                                                                    },
+                                                                  );
+                                                                }),
+                                                          ),
                                                         ),
-                                                      ),
+                                                      ]),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                      color: Colors.orange,
                                                     ),
-                                                  )
-                                                ],
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              5.0),
+                                                      child: ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      8.0),
+                                                          child: Container(
+                                                            height: 150,
+                                                            child: Center(
+                                                              child: Image.asset(
+                                                                  'images/avatar.png'),
+                                                            ),
+                                                          )),
+                                                    ),
+                                                  ),
+                                                ),
                                               )
+                                            ],
+                                          )
                                       ],
                                     ),
                                   )),
@@ -544,7 +555,7 @@ class MainScreen extends StatelessWidget {
         : Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              color: customGray,
+              color: ColorManager.darkGrey,
             ),
             child: Padding(
               padding: const EdgeInsets.all(15.0),

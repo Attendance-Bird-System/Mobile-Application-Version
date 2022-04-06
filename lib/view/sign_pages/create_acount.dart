@@ -1,10 +1,9 @@
 import 'package:auto_id/cubit/cubit.dart';
 import 'package:auto_id/cubit/states.dart';
-import 'package:auto_id/reusable/reuse_components.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../resources/color_manager.dart';
 
 // ignore: must_be_immutable
 class NewSheetPage extends StatelessWidget {
@@ -15,12 +14,6 @@ class NewSheetPage extends StatelessWidget {
   var passController_2 = TextEditingController();
   var phoneController = TextEditingController();
   var validateController = TextEditingController();
-
-  NewSheetPage() {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: customGray, // status bar color
-    ));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +33,9 @@ class NewSheetPage extends StatelessWidget {
             }
           },
           child: Scaffold(
-            backgroundColor: customGray,
+            backgroundColor: ColorManager.darkGrey,
             appBar: AppBar(
-              backgroundColor: customGray,
+              backgroundColor: ColorManager.darkGrey,
               foregroundColor: Colors.white,
               elevation: 0,
             ),

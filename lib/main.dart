@@ -1,41 +1,48 @@
+import 'package:auto_id/view/main_screen.dart';
+import 'package:auto_id/view/resources/color_manager.dart';
+import 'package:auto_id/view/resources/string_manager.dart';
+import 'package:auto_id/view/start_screen/signing/login_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'cubit/auth_bloc/auth_status_bloc.dart';
 import 'cubit/cubit.dart';
-import 'layouts/sign_pages/login_page.dart';
-import 'layouts/main_screen.dart';
+import 'model/local/pref_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Bloc.observer = MyBlocObserver();
 
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.orange, // status bar color
   ));
 
-  final prefs = await SharedPreferences.getInstance();
-  bool? userHere = prefs.getBool("rememberMe");
+  await Firebase.initializeApp();
+  await PreferenceRepository.initializePreference();
 
-  runApp(MyApp(userHere ?? false));
+  runApp(MyApp());
 }
 
 // ignore: must_be_immutable
 class MyApp extends StatelessWidget {
-  bool isHere;
-  MyApp(this.isHere);
+  MyApp();
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (BuildContext context) => AppCubit()..getUserLoginData(isHere),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => AuthStatusBloc()),
+        BlocProvider(create: (_) => AppCubit()..getUserLoginData(false)),
+      ],
       child: MaterialApp(
-        title: 'ID APP',
+        title: StringManger.appName,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.orange,
+          // primarySwatch: ColorManager.mainOrange,
+          primaryColor: ColorManager.mainOrange,
         ),
-        home: isHere ? MainScreen() : LoginPage(),
+        home: context.read<AuthStatusBloc>().state.user.isEmpty
+            ? LoginView()
+            : MainScreen(),
       ),
     );
   }
