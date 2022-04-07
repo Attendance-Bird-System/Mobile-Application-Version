@@ -1,17 +1,16 @@
-import 'package:auto_id/cubit/cubit.dart';
-import 'package:auto_id/cubit/states.dart';
-import 'package:auto_id/reusable/reuse_components.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:auto_id/view/resources/color_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../bloc/cubit.dart';
+import '../bloc/states.dart';
 
 // ignore: must_be_immutable
 class SheetFeatures extends StatelessWidget {
   var wifiNameController = TextEditingController();
   var passController = TextEditingController();
   var formKey = GlobalKey<FormState>();
+  bool hidePassword = false;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +43,7 @@ class SheetFeatures extends StatelessWidget {
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
-                                color: customGray),
+                                color: ColorManager.darkGrey),
                           ),
                         ),
                         Padding(
@@ -97,7 +96,7 @@ class SheetFeatures extends StatelessWidget {
                                   ),
                                   TextFormField(
                                       controller: passController,
-                                      obscureText: cubit.hidePassword,
+                                      obscureText: hidePassword,
                                       validator: (value) {
                                         if (value!.isEmpty) {
                                           return 'password cannot be empty';
@@ -109,12 +108,12 @@ class SheetFeatures extends StatelessWidget {
                                         labelText: "Password",
                                         prefixIcon: Icon(Icons.lock),
                                         suffixIcon: IconButton(
-                                          icon: Icon(cubit.hidePassword
+                                          icon: Icon(hidePassword
                                               ? Icons.visibility
                                               : Icons.visibility_off),
                                           onPressed: () {
                                             print(passController.text);
-                                            cubit.changePassShowClicked();
+                                            // cubit.changePassShowClicked();
                                           },
                                         ),
                                         enabledBorder: OutlineInputBorder(
@@ -168,6 +167,53 @@ class SheetFeatures extends StatelessWidget {
           ),
         ));
       },
+    );
+  }
+
+  Widget upperTriangle(BuildContext context) {
+    return Expanded(
+      child: Stack(children: [
+        Container(
+          child: MediaQuery.of(context).size.height < 400
+              ? Container()
+              : Image.asset(
+                  'images/p1.png',
+                  fit: BoxFit.fill,
+                  width: MediaQuery.of(context).size.width / 2,
+                ),
+        ),
+        Center(
+            child: Padding(
+          padding: const EdgeInsets.only(left: 15.0),
+          child: Text(
+            'Easy Tag',
+            style: TextStyle(
+                color: Colors.orange,
+                fontSize: MediaQuery.of(context).size.height / 20,
+                fontWeight: FontWeight.bold),
+          ),
+        ))
+      ]),
+    );
+  }
+
+  Widget lowerTriangle(BuildContext context) {
+    return Expanded(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Container(
+            child: MediaQuery.of(context).size.height < 400
+                ? Container()
+                : Image.asset(
+                    'images/p2.png',
+                    fit: BoxFit.fill,
+                    width: MediaQuery.of(context).size.width / 2,
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

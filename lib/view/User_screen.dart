@@ -1,12 +1,10 @@
-import 'package:auto_id/cubit/cubit.dart';
-import 'package:auto_id/cubit/states.dart';
-import 'package:auto_id/reusable/reuse_components.dart';
-import 'package:flutter/cupertino.dart';
+import '../shared/functions/dialogs.dart';
+import 'package:auto_id/view/resources/color_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../bloc/cubit.dart';
+import '../bloc/states.dart';
 import 'edit_user.dart';
 
 // ignore: must_be_immutable
@@ -62,7 +60,7 @@ class UserScreen extends StatelessWidget {
                       : Icon(Icons.restore_from_trash_outlined),
                   onPressed: () {
                     //print(userIndex);
-                    customCupertinoDialog(context,
+                    customChoiceDialog(context,
                         title: "Warning",
                         content: "Are you sure you want to delete user ",
                         yesFunction: () {
@@ -170,7 +168,7 @@ class UserScreen extends StatelessWidget {
           child: Text(
             ':  ${cubit.userData.keys.toList()[index]}',
             style: TextStyle(
-              color: customGray,
+              color: ColorManager.darkGrey,
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
@@ -192,7 +190,7 @@ class UserScreen extends StatelessWidget {
       Text(
         '${cubit.userData.keys.toList()[index]} : ',
         style: TextStyle(
-          color: customGray,
+          color: ColorManager.darkGrey,
           fontWeight: FontWeight.bold,
           fontSize: 18,
         ),
