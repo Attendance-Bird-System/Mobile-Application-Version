@@ -144,7 +144,9 @@ class UserScreen extends StatelessWidget {
             height: 10,
           ),
           Text(
-            cubit.showedUserData['ID'] == null ? "-" : 'ID : ${cubit.showedUserData['ID']}',
+            cubit.showedUserData['ID'] == null
+                ? "-"
+                : 'ID : ${cubit.showedUserData['ID']}',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           SizedBox(

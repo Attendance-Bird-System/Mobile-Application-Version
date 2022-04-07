@@ -186,7 +186,8 @@ class EditUserScreen extends StatelessWidget {
 
     print(cubit.showedUserData);
     if ((dataHere && dataWritten) || state is GetGroupPersonDone) {
-      editUserController[index].text = cubit.showedUserData.values.toList()[index];
+      editUserController[index].text =
+          cubit.showedUserData.values.toList()[index];
       dataWritten = false;
       // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
       cubit.emit(GetGroupPersonError());

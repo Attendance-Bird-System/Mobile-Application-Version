@@ -34,7 +34,6 @@ class AppCubit extends Cubit<AppStates> {
   int tableNumberOfUnnamedColumns = 0;
   List<String> renameRowsName = [];
 
-
   void deleteUser(int userIndex, int groupIndex, BuildContext context) {
     emit(DeletePersonLoading());
     var url = Uri.parse(
@@ -204,7 +203,6 @@ class AppCubit extends Cubit<AppStates> {
     }
   }
 
-
   void addColumnNames(String id, String groupName, BuildContext context) {
     // run the script to make a column with the id
     var url = Uri.parse(
@@ -369,7 +367,6 @@ class AppCubit extends Cubit<AppStates> {
     tableNameRows = [DataRow(cells: dCells1), DataRow(cells: dCells2)];
   }
 
-
   void changeNeededColumns() {
     emit(ChangeNeededColumnsState());
   }
@@ -378,6 +375,7 @@ class AppCubit extends Cubit<AppStates> {
     renameRowsName = [];
     emit(ChangeAddTabState());
   }
+
   ///**********************************************/
   Future<void> getFireData() async {
     cardStudent = await _adminDataRepository.readAdminData();
