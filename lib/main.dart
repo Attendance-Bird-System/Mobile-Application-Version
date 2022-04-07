@@ -1,41 +1,59 @@
+import 'model/module/users/app_admin.dart';
+import 'package:auto_id/view/main_screen.dart';
+import 'package:auto_id/view/resources/color_manager.dart';
+import 'package:auto_id/view/resources/string_manager.dart';
+import 'package:auto_id/view/start_screen/onboarding/on_boarding_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'cubit/cubit.dart';
-import 'layouts/sign_pages/login_page.dart';
-import 'layouts/main_screen.dart';
+import 'bloc/auth_bloc/auth_status_bloc.dart';
+
+import 'bloc/cubit.dart';
+import 'model/local/pref_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Bloc.observer = MyBlocObserver();
-
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.orange, // status bar color
   ));
-
-  final prefs = await SharedPreferences.getInstance();
-  bool? userHere = prefs.getBool("rememberMe");
-
-  runApp(MyApp(userHere ?? false));
+  await Firebase.initializeApp();
+  await PreferenceRepository.initializePreference();
+  await FirebaseAuth.instance.signOut();
+  User? user = FirebaseAuth.instance.currentUser;
+  AppAdmin tempUser = AppAdmin.empty;
+  if (user != null) {
+    tempUser = AppAdmin.fromFirebaseUser(user);
+  }
+  print(tempUser.id);
+  runApp(MyApp(tempUser));
 }
 
 // ignore: must_be_immutable
 class MyApp extends StatelessWidget {
-  bool isHere;
-  MyApp(this.isHere);
+  final AppAdmin user;
+  MyApp(this.user);
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (BuildContext context) => AppCubit()..getUserLoginData(isHere),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => AuthStatusBloc()),
+        BlocProvider(create: (_) => AppCubit()..getInitialData(user)),
+      ],
       child: MaterialApp(
-        title: 'ID APP',
+        title: StringManger.appName,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
+          indicatorColor: ColorManager.whiteColor,
+          progressIndicatorTheme: ProgressIndicatorThemeData(
+            circularTrackColor: ColorManager.whiteColor,
+          ),
           primarySwatch: Colors.orange,
+          primaryColor: ColorManager.mainOrange,
         ),
-        home: isHere ? MainScreen() : LoginPage(),
+        home: user.isEmpty ? OnBoardingView() : MainScreen(),
       ),
     );
   }

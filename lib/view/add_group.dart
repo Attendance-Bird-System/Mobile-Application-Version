@@ -1,13 +1,10 @@
-import 'package:auto_id/cubit/cubit.dart';
-import 'package:auto_id/cubit/states.dart';
-import 'package:auto_id/reusable/reuse_components.dart';
+import 'package:auto_id/view/resources/color_manager.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../bloc/cubit.dart';
+import '../bloc/states.dart';
 
 // ignore: must_be_immutable
 class AddGroup extends StatelessWidget {
@@ -34,7 +31,7 @@ class AddGroup extends StatelessWidget {
           },
           child: Scaffold(
               floatingActionButton: FloatingActionButton(
-                backgroundColor: customGray,
+                backgroundColor: ColorManager.darkGrey,
                 child: state is CreateSpreadSheetLoading
                     ? CircularProgressIndicator(
                         color: Colors.white,
@@ -168,7 +165,7 @@ class AddGroup extends StatelessWidget {
                                   'specify your needed columns',
                                   style: TextStyle(
                                       fontSize: 20,
-                                      color: customGray,
+                                      color: ColorManager.darkGrey,
                                       fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -477,7 +474,8 @@ class AddGroup extends StatelessWidget {
                                                             fontSize: 18,
                                                             fontWeight:
                                                                 FontWeight.bold,
-                                                            color: customGray)),
+                                                            color: ColorManager
+                                                                .darkGrey)),
                                                   ),
                                                   Form(
                                                     key: formKey2,
@@ -525,7 +523,8 @@ class AddGroup extends StatelessWidget {
                                                               OutlineInputBorder(
                                                             borderSide: BorderSide(
                                                                 color:
-                                                                    customGray,
+                                                                    ColorManager
+                                                                        .darkGrey,
                                                                 width: 2.0),
                                                             borderRadius:
                                                                 BorderRadius
