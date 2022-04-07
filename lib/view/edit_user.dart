@@ -10,6 +10,7 @@ import '../bloc/states.dart';
 class EditUserScreen extends StatelessWidget {
   var formKey = GlobalKey<FormState>();
   final TextEditingController typeAheadController = TextEditingController();
+  List editUserController = [];
 
   String id;
   int groupIndex;
@@ -27,7 +28,7 @@ class EditUserScreen extends StatelessWidget {
       builder: (BuildContext context, AppStates state) {
         AppCubit cubit = AppCubit.get(context);
         if (dataHere && typeAheadController.text.isEmpty) {
-          typeAheadController.text = cubit.userData['Name'];
+          typeAheadController.text = cubit.showedUserData['Name'];
         }
         return GestureDetector(
           onTap: () {
@@ -75,16 +76,21 @@ class EditUserScreen extends StatelessWidget {
                       ),
                 onPressed: () {
                   Map dataToSent = {};
-                  for (int i = 0; i < cubit.activeGroupColumns.length; i++) {
-                    if (!cubit.activeGroupColumns[i].contains('/')) {
-                      if (cubit.activeGroupColumns[i].trim() == 'Name') {
-                        dataToSent[cubit.activeGroupColumns[i]] =
+                  for (int i = 0;
+                      i < (cubit.groups?[groupIndex].columnNames?.length ?? 0);
+                      i++) {
+                    if (!cubit.groups![groupIndex].columnNames![i]
+                        .contains('/')) {
+                      if (cubit.groups![groupIndex].columnNames![i] == 'Name') {
+                        dataToSent[cubit.groups![groupIndex].columnNames![i]] =
                             this.typeAheadController.text;
-                      } else if (cubit.activeGroupColumns[i].trim() != 'ID') {
-                        dataToSent[cubit.activeGroupColumns[i]] =
-                            cubit.editUserController[i].text.isEmpty
+                      } else if (cubit.groups![groupIndex].columnNames![i]
+                              .trim() !=
+                          'ID') {
+                        dataToSent[cubit.groups![groupIndex].columnNames![i]] =
+                            editUserController[i].text.isEmpty
                                 ? "Empty"
-                                : cubit.editUserController[i].text;
+                                : editUserController[i].text;
                       }
                     }
                   }
@@ -99,7 +105,8 @@ class EditUserScreen extends StatelessWidget {
                     child: TypeAheadField(
                       suggestionsCallback: (pattern) async {
                         List<String> sug = [];
-                        for (var i in cubit.activeGroupNames) {
+                        for (var i
+                            in cubit.groups![groupIndex].studentNames ?? []) {
                           if (i.contains(pattern)) {
                             sug.add(i);
                           }
@@ -107,8 +114,7 @@ class EditUserScreen extends StatelessWidget {
                         return sug;
                       },
                       onSuggestionSelected: (suggestion) {
-                        print(cubit.activeGroupNames);
-                        int userIndex = cubit.activeGroupNames
+                        int userIndex = cubit.groups![groupIndex].studentNames!
                             .indexOf(suggestion.toString());
                         print(userIndex);
                         dataHere = true;
@@ -141,7 +147,9 @@ class EditUserScreen extends StatelessWidget {
                       ? Center(child: CircularProgressIndicator())
                       : Expanded(
                           child: ListView.separated(
-                              itemCount: cubit.activeGroupColumns.length,
+                              itemCount: cubit.groups?[groupIndex].columnNames
+                                      ?.length ??
+                                  0,
                               itemBuilder: (context, index) {
                                 return inputBuilder(index, cubit, state);
                               },
@@ -161,32 +169,30 @@ class EditUserScreen extends StatelessWidget {
   }
 
   Widget inputBuilder(int index, AppCubit cubit, AppStates state) {
-    if (cubit.editUserController.length < cubit.activeGroupColumns.length) {
-      cubit.editUserController.add(TextEditingController());
-      print(cubit.editUserController.length);
-      print('index $index');
+    if (editUserController.length <
+        (cubit.groups?[groupIndex].columnNames?.length ?? 0)) {
+      editUserController.add(TextEditingController());
     }
 
-    if (cubit.activeGroupColumns[index].contains('/')) {
+    if (cubit.groups?[groupIndex].columnNames?[index].contains('/') ?? false) {
       // photo
       return Container();
     }
 
-    if (cubit.activeGroupColumns[index].trim() == 'Name' ||
-        cubit.activeGroupColumns[index].trim() == 'ID') {
+    if (cubit.groups?[groupIndex].columnNames?[index].trim() == 'Name' ||
+        cubit.groups?[groupIndex].columnNames?[index].trim() == 'ID') {
       return Container();
     }
 
-    print(cubit.userData);
+    print(cubit.showedUserData);
     if ((dataHere && dataWritten) || state is GetGroupPersonDone) {
-      cubit.editUserController[index].text =
-          cubit.userData.values.toList()[index];
+      editUserController[index].text = cubit.showedUserData.values.toList()[index];
       dataWritten = false;
       // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
       cubit.emit(GetGroupPersonError());
     }
     return TextFormField(
-        controller: cubit.editUserController[index],
+        controller: editUserController[index],
         validator: (value) {
           if (value!.isEmpty) {
             return 'that field cannot be empty';
@@ -195,7 +201,7 @@ class EditUserScreen extends StatelessWidget {
           }
         },
         decoration: InputDecoration(
-          labelText: "${cubit.activeGroupColumns[index]}",
+          labelText: "${cubit.groups?[groupIndex].columnNames?[index]}",
           prefixIcon: Icon(Icons.input),
           enabledBorder: OutlineInputBorder(
             borderSide: const BorderSide(color: Colors.orange, width: 2.0),

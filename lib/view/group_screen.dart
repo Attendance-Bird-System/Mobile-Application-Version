@@ -1,9 +1,12 @@
+import 'package:flutter/services.dart';
+
 import '../shared/functions/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/cubit.dart';
 import '../bloc/states.dart';
+import '../shared/widgets/toast_helper.dart';
 
 // ignore: must_be_immutable
 class GroupScreen extends StatelessWidget {
@@ -30,7 +33,13 @@ class GroupScreen extends StatelessWidget {
                       ))
                     : IconButton(
                         onPressed: () {
-                          cubit.getGroupLink(context);
+                          var id = cubit.groups![groupIndex].id;
+                          Clipboard.setData(ClipboardData(
+                              text: "https://docs.google.com/spreadsheets/d/" +
+                                  id +
+                                  "/edit?usp=sharing"));
+                          showToast("The sheet Link copied to clipboard",
+                              type: ToastType.success);
                         },
                         icon: Icon(Icons.link),
                         iconSize: 30,
@@ -59,7 +68,7 @@ class GroupScreen extends StatelessWidget {
                 ),
               ),
               title: Text(
-                '${cubit.groupNames[groupIndex - 1]}',
+                '${cubit.groups?[groupIndex - 1].name}',
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
@@ -69,7 +78,8 @@ class GroupScreen extends StatelessWidget {
                 child: state is GetGroupNamesLoading
                     ? Center(child: CircularProgressIndicator())
                     : ListView.separated(
-                        itemCount: cubit.activeGroupNames.length,
+                        itemCount:
+                            cubit.groups?[groupIndex].columnNames?.length ?? 0,
                         itemBuilder: (context, index) {
                           return groupItemBuilder(
                               index, context, cubit, groupIndex, state);
@@ -122,7 +132,7 @@ class GroupScreen extends StatelessWidget {
                     child: Padding(
                       padding: EdgeInsets.all(10),
                       child: Text(
-                        '${cubit.activeGroupNames[index]}',
+                        '${cubit.groups![groupIndex].studentNames![index]}',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,

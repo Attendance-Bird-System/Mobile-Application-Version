@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:auto_id/model/module/group_details.dart';
+import 'package:auto_id/model/module/students/card_student.dart';
+import 'package:auto_id/model/repository/realtime_firebase.dart';
+
 import '../model/module/users/app_admin.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 
@@ -20,168 +22,33 @@ class AppCubit extends Cubit<AppStates> {
   AppCubit() : super(AppInitial());
   static AppCubit get(context) => BlocProvider.of(context);
 
-  static AppAdmin appUser = AppAdmin.empty;
-  final dataBase = FirebaseDatabase.instance.ref();
+  static AppAdmin appAdmin = AppAdmin.empty;
+  AdminDataRepository _adminDataRepository = AdminDataRepository();
+  CardStudent cardStudent = CardStudent(state: StudentState.loading);
+  List<GroupDetails>? groups;
+  Map<String, dynamic> showedUserData = {};
 
-  int groupLen = 0;
-  bool groupsExist = false;
-  int addIndex = 0;
-  bool useSheetRowAsName = true;
+  /// ************************************************************/
   List<DataColumn> tableNameColumns = [];
   List<DataRow> tableNameRows = [];
   int tableNumberOfUnnamedColumns = 0;
-  int currentColumnToFill = 65;
   List<String> renameRowsName = [];
-  List<bool> neededColumns = [
-    true,
-    true,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false
-  ];
-  List<String> neededColumnsNames = [
-    "ID",
-    "Name",
-    "Gender",
-    "Department",
-    "Image",
-    "Phone",
-    "second-Phone",
-    "Email",
-    "LinkedIn",
-    "Facebook",
-    "Address"
-  ];
-  List<String> groupNames = [];
-  List editUserController = [];
-  Map<String, dynamic> userData = {};
-  List<String> activeGroupNames = [];
-  List<String> activeGroupColumns = [];
-  int activeGroup = 0;
-  String userImageUrl = '';
-  String currentUserId = "";
-  String currentUserState = "";
-  String lastUserName = "";
-  int lastUserGroupIndex = 0;
-  String currentUserGroupImageUrl = "";
-  // ignore: cancel_subscriptions
-  StreamSubscription? listener;
 
-  void deleteGroup(int groupIndex, BuildContext context) {
-    emit(DeleteGroupLoading());
-    Navigator.of(context).pop();
-    dataBase.child(appUser.id).child("Groups").get().then((DataSnapshot snap) {
-      dynamic doc = snap.value;
-      Map<String, String> newData = {};
-      groupLen--;
-      groupNames.removeAt(groupIndex - 1);
-      doc.remove('g$groupIndex');
-      int i = 0;
-      for (String val in doc.values) {
-        i++;
-        newData['g$i'] = val;
-      }
-      dataBase
-          .child(appUser.id)
-          .update({"nGroups": groupLen, "Groups": newData});
-      print(newData);
-      emit(DeleteGroupDone());
-    }).catchError((err) {
-      showToast("An error happened while deleting The group");
-      emit(DeleteGroupError());
-    });
-  }
 
   void deleteUser(int userIndex, int groupIndex, BuildContext context) {
     emit(DeletePersonLoading());
     var url = Uri.parse(
         "https://script.google.com/macros/s/AKfycbxx3WO2ZZQ0jSInhHwsl6p3ZvnM4NAVP-ka0ecbqkZJRnOlj8G7qTyvZcZdknsQGvk/exec?" +
-            "fun=remove&group=$groupIndex&person_id=$userIndex&userName=${appUser.id}");
+            "fun=remove&group=$groupIndex&person_id=$userIndex&userName=${appAdmin.id}");
     print(url);
     http.read(url).then((value) {
       print(value);
       emit(DeletePersonDone());
       navigateAndReplace(context, MainScreen());
-      activeGroup = 0;
     }).catchError((onError) {
       showToast("Error at deleting");
       emit(DeletePersonError());
       print(onError);
-    });
-  }
-
-  void getFireData() {
-    emit(FireDataGetting());
-    print("fire data");
-    dataBase.child(appUser.id).get().then((DataSnapshot snap) {
-      dynamic doc = snap.value;
-      this.currentUserId = "${doc['lastID'].split(',')[0]}";
-      this.currentUserState = "${doc.split(',')[1]}";
-
-      var data = doc['data'].split(',');
-      var temp = '';
-      if (data[0].toString().isNotEmpty) {
-        temp = data[0].substring(1, data[0].toString().length);
-        if (temp.toString().isNotEmpty) lastUserGroupIndex = int.parse(temp);
-        lastUserName = data[1];
-        temp = data[2];
-      }
-      currentUserGroupImageUrl = '';
-      if (temp.toString().contains("drive.google.com")) {
-        currentUserGroupImageUrl =
-            "https://drive.google.com/uc?export=view&id=" + temp.split('/')[5];
-      }
-    }).then((value) {
-      emit(FireDataGot());
-    });
-    print("hehe iam listening");
-    listener = dataBase.child(appUser.id).onChildChanged.listen((event) {
-      emit(FireDataGetting());
-      DataSnapshot snap = event.snapshot;
-      switch (snap.key) {
-        case "lastID":
-          this.currentUserId = "${snap.value.toString().split(',')[0]}";
-          this.currentUserState = "${snap.value.toString().split(',')[1]}";
-          emit(FireDataGot());
-          break;
-        case "data":
-          var data = snap.value.toString().split(',');
-          if (data[0].toString().isNotEmpty) {
-            var temp = data[0].substring(1, data[0].toString().length);
-            if (temp.toString().isNotEmpty)
-              lastUserGroupIndex = int.parse(temp);
-            lastUserName = data[1];
-            temp = data[2];
-            currentUserGroupImageUrl = '';
-            if (temp.toString().contains("drive.google.com")) {
-              currentUserGroupImageUrl =
-                  "https://drive.google.com/uc?export=view&id=" +
-                      temp.split('/')[5];
-            }
-          }
-          break;
-      }
-      emit(FireDataGot());
-    });
-  }
-
-  void getGroupLink(BuildContext context) {
-    emit(GetGroupLinkLoading());
-    dataBase.child(appUser.id).child('Groups').get().then((DataSnapshot value) {
-      dynamic doc = value.value;
-      var id = doc['g$activeGroup'].split(',')[0];
-      Clipboard.setData(ClipboardData(
-          text: "https://docs.google.com/spreadsheets/d/" +
-              id +
-              "/edit?usp=sharing"));
-      showToast("The sheet Link copied to clipboard", type: ToastType.success);
-      emit(GetGroupLinkDone());
     });
   }
 
@@ -193,22 +60,19 @@ class AppCubit extends Cubit<AppStates> {
             "&group=$groupIndex" +
             "&user_data=$dataToSent" +
             "&person_id=$id" +
-            "&userName=${appUser.id}");
+            "&userName=${appAdmin.id}");
     print(url);
     http.read(url).then((value) {
       print("returned Data");
       print(value);
-      if (currentUserState == "notfound" && currentUserId == id) {
-        currentUserState = "new";
-        lastUserName = dataToSent['Name'];
-        lastUserGroupIndex = activeGroup;
-        currentUserGroupImageUrl = "";
-        dataBase.child(appUser.id).update({
-          "lastID": "$currentUserId,new",
-          "data": "g$groupIndex,$lastUserName,photo"
-        });
+      if (cardStudent.state == StudentState.newStudent &&
+          cardStudent.id == id) {
+        cardStudent = cardStudent.copyWith(
+            name: dataToSent['Name'],
+            groupIndex: groupIndex,
+            state: StudentState.notRegistered);
+        _adminDataRepository.updateCardState();
       }
-      activeGroup = 0;
       navigateAndReplace(context, MainScreen());
     }).catchError((err) {
       print("error is $err");
@@ -217,11 +81,11 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   void goToUser(int groupIndex, int userIndex, BuildContext context) {
-    userData = {};
+    showedUserData = {};
     emit(GetGroupPersonLoading());
     var url = Uri.parse(
         "https://script.google.com/macros/s/AKfycbzAWq8QxQDISfOGFEougyd4gK29jQr3SWRUbDBgAR4Q6E-rekQbHqkrouqkidbG5SY/exec?" +
-            "userName=${appUser.id}" +
+            "userName=${appAdmin.id}" +
             "&group=$groupIndex" +
             "&index=${userIndex + 1}");
     http.read(url).catchError((err) {
@@ -232,18 +96,19 @@ class AppCubit extends Cubit<AppStates> {
         value = value.replaceAll(',', '","');
         value = value.replaceAll('https":"', "https:");
         value = value.replaceAll('http":"', "http:");
-        userData = json.decode(value);
+        showedUserData = json.decode(value);
       }
-      userImageUrl = "";
-      for (var v in userData.values) {
+      showedUserData['userImageUrl'] = "";
+      for (var v in showedUserData.values) {
         if (v.contains('drive.google.com')) {
           print(v);
           if (v.contains('id')) {
-            userImageUrl = v.toString();
+            showedUserData['userImageUrl'] = v.toString();
           } else {
             try {
-              userImageUrl = "https://drive.google.com/uc?export=view&id=" +
-                  v.split('/')[5];
+              showedUserData['userImageUrl'] =
+                  "https://drive.google.com/uc?export=view&id=" +
+                      v.split('/')[5];
             } catch (err) {
               print(err);
             }
@@ -256,39 +121,38 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   void goToEditUser(int index, BuildContext context) {
-    editUserController = [];
     emit(GoToEditUserLoading());
-    if (index != activeGroup) {
-      activeGroup = index;
-      activeGroupNames = [];
+    if (groups?[index].columnNames == null) {
       var url = Uri.parse(
           "https://script.google.com/macros/s/AKfycbwCgPd0uvbcYCrn3D5v-4GsH_E9OhMUakXe2D3tY0phqN3nxivfWn3efJ4TE6ckqgXa/exec?" +
-              "userName=${appUser.id}" +
+              "userName=${appAdmin.id}" +
               "&group=$index");
       http.read(url).then((value) {
         if (!value.startsWith('<!DOCTYPE')) {
           var list = value.split("!");
-          activeGroupNames = list[0].split(',');
-          activeGroupColumns = list[1].split(',');
+          groups![index].studentNames = list[0].split(',');
+          groups![index].columnNames = list[1].split(',');
         }
-        navigateAndPush(context, EditUserScreen(currentUserId, index, false));
+        navigateAndPush(
+            context, EditUserScreen(cardStudent.id ?? "", index, false));
         emit(GoToEditUserDone());
       }).catchError((onError) {
         emit(GoToEditUserError());
         print(onError);
       });
     } else {
-      navigateAndPush(context, EditUserScreen(currentUserId, index, false));
+      navigateAndPush(
+          context, EditUserScreen(cardStudent.id ?? "", index, false));
       emit(GetGroupNamesDone());
     }
   }
 
   void getUserData(int groupIndex, int userIndex, BuildContext context) {
-    userData = {};
+    showedUserData = {};
     emit(GetGroupPersonLoading());
     var url = Uri.parse(
         "https://script.google.com/macros/s/AKfycbzAWq8QxQDISfOGFEougyd4gK29jQr3SWRUbDBgAR4Q6E-rekQbHqkrouqkidbG5SY/exec?" +
-            "userName=${appUser.id}" +
+            "userName=${appAdmin.id}" +
             "&group=$groupIndex" +
             "&index=${userIndex + 1}");
     http.read(url).catchError((err) {
@@ -300,7 +164,7 @@ class AppCubit extends Cubit<AppStates> {
         value = value.replaceAll(',', '","');
         value = value.replaceAll('https":"', "https:");
         value = value.replaceAll('http":"', "http:");
-        userData = json.decode(value);
+        showedUserData = json.decode(value);
       }
       emit(GetGroupPersonDone());
     });
@@ -308,12 +172,10 @@ class AppCubit extends Cubit<AppStates> {
 
   void getGroupNamesData(int index, BuildContext context) {
     emit(GetGroupNamesLoading());
-    if (index != activeGroup) {
-      activeGroup = index;
-      activeGroupNames = [];
+    if (groups?[index].columnNames == null) {
       var url = Uri.parse(
           "https://script.google.com/macros/s/AKfycbwCgPd0uvbcYCrn3D5v-4GsH_E9OhMUakXe2D3tY0phqN3nxivfWn3efJ4TE6ckqgXa/exec?" +
-              "userName=${appUser.id}" +
+              "userName=${appAdmin.id}" +
               "&group=$index");
       http.read(url).catchError((err) {
         print(err);
@@ -321,8 +183,8 @@ class AppCubit extends Cubit<AppStates> {
       }).then((value) {
         if (!value.startsWith('<!DOCTYPE')) {
           var list = value.split("!");
-          activeGroupNames = list[0].split(',');
-          activeGroupColumns = list[1].split(',');
+          groups![index].studentNames = list[0].split(',');
+          groups![index].columnNames = list[1].split(',');
         }
         navigateAndPush(context, GroupScreen(index));
         emit(GetGroupNamesDone());
@@ -333,27 +195,7 @@ class AppCubit extends Cubit<AppStates> {
     }
   }
 
-  Future<void> getGroupNames() async {
-    emit(GetGroupDataLoading());
-    if (appUser.id.isNotEmpty) {
-      dataBase.child(appUser.id).get().then((snap) {
-        dynamic doc = snap.value;
-        print(doc);
-        groupLen = doc?['nGroups'] ?? 0;
-        dataBase.child(appUser.id).child("Groups").get().then((snap) {
-          dynamic doc = snap.value;
-          groupNames = [];
-          for (int i = 1; i <= groupLen; i++) {
-            groupNames.add(doc['g$i'].split(',')[1]);
-          }
-          groupsExist = true;
-          emit(GetGroupDatDone());
-        });
-      });
-    }
-  }
-
-  void getNamesFromBoolean() {
+  void getNamesFromBoolean(List<bool> neededColumns) {
     renameRowsName = [];
     for (int i = 0; i < 11; i++) {
       if (neededColumns[i]) {
@@ -362,10 +204,6 @@ class AppCubit extends Cubit<AppStates> {
     }
   }
 
-  void changeNeededColumns(int index) {
-    neededColumns[index] = !neededColumns[index];
-    emit(ChangeNeededColumnsState());
-  }
 
   void addColumnNames(String id, String groupName, BuildContext context) {
     // run the script to make a column with the id
@@ -382,31 +220,17 @@ class AppCubit extends Cubit<AppStates> {
     });
   }
 
-  Future<void> createGroup(String id, String name, BuildContext context) async {
-    var data = dataBase.child(appUser.id);
-    groupLen++;
-    String childName = "g$groupLen";
-    data.update({'nGroups': groupLen});
-    groupNames.add(name);
-    data.child('Groups').update({childName: "$id,$name"}).catchError((err) {
-      print(err);
-      emit(CreateGroupError());
-    }).then((value) {
-      navigateAndReplace(context, MainScreen());
-    });
-  }
-
   Future<String> createSpreadSheet(String groupName, BuildContext context) {
     emit(CreateSpreadSheetLoading());
     var url = Uri.parse(
         "https://script.google.com/macros/s/AKfycbz3o9eqSWAGqFUf1C2Vk1waU6DgaqyVUjPtSyz9rw8ZQ-o_8U_aAwnnCaunX1Heo3Vn/exec?name=" +
-            appUser.id +
+            appAdmin.id +
             " " +
             groupName);
     return http.read(url);
   }
 
-  void addRowName(String value, BuildContext context) {
+  void addRowName(String value, int currentColumnToFill, BuildContext context) {
     if (currentColumnToFill - 64 <= tableNumberOfUnnamedColumns) {
       renameRowsName.add(value.replaceAll(" ", "-"));
       currentColumnToFill++;
@@ -415,6 +239,102 @@ class AppCubit extends Cubit<AppStates> {
       showToast("You name all column click the create button",
           type: ToastType.info);
     }
+  }
+
+  void testLink(BuildContext context, String groupName, String link) {
+    emit(TestLinkLoading());
+    emit(CreateSpreadSheetLoading());
+    String id = link.split('/')[5];
+    var url = Uri.parse(
+        "https://script.google.com/macros/s/AKfycbzi7OBUEk5ZaBWeOjelTJMVMaJnK4zTU78UwB59qJW0GvJBnZ_daHmY_VPusN3xCZb0jw/exec?id=" +
+            id);
+    http.read(url).catchError((err) {
+      print(err);
+      showToast("Error happened while reading the data please try again");
+      emit(TestLinkError());
+    }).then((value) {
+      if (value.trim() == '-1') {
+        showToast(
+          "Invalid sheet please make sure that the url is public and editor",
+        );
+        emit(TestLinkError());
+      } else {
+        // Link Is Ok
+        createGroup(id, groupName, context);
+        emit(TestLinkDone());
+      }
+    });
+  }
+
+  void useSheetRowAsNameCheckBox(
+      BuildContext context, bool useSheetRowAsName, String link) {
+    emit(UseSheetRowAsNameLoading());
+    renameRowsName = [];
+    if (useSheetRowAsName) {
+      useSheetRowAsName = !useSheetRowAsName;
+      String id = link.split('/')[5];
+      var url = Uri.parse(
+          "https://script.google.com/macros/s/AKfycbzi7OBUEk5ZaBWeOjelTJMVMaJnK4zTU78UwB59qJW0GvJBnZ_daHmY_VPusN3xCZb0jw/exec?id=" +
+              id);
+      http.read(url).catchError((err) {
+        print(err);
+        useSheetRowAsName = !useSheetRowAsName;
+        showToast("Error happened while reading the data please try again");
+        emit(UseSheetRowAsNameError());
+      }).then((value) {
+        if (value.trim() == '-1') {
+          useSheetRowAsName = !useSheetRowAsName;
+          showToast(
+              "Invalid sheet please make sure that the url is public and editor");
+          emit(UseSheetRowAsNameError());
+        } else {
+          createTable(value);
+          emit(UseSheetRowAsNameDone());
+        }
+      });
+    } else {
+      useSheetRowAsName = !useSheetRowAsName;
+      emit(UseSheetRowAsNameDone());
+    }
+  }
+
+  void sendToEsp(BuildContext context, String wifiName, String wifiPassword) {
+    emit(SendToEspLoading());
+    wifiPassword = wifiPassword.replaceAll("#", "%23");
+    wifiPassword = wifiPassword.replaceAll("&", "%26");
+    wifiPassword = wifiPassword.replaceAll("\$", "%24");
+    wifiPassword = wifiPassword.replaceAll(" ", "%20");
+
+    wifiName = wifiName.replaceAll("#", "%23");
+    wifiName = wifiName.replaceAll("&", "%26");
+    wifiName = wifiName.replaceAll("\$", "%24");
+    wifiName = wifiName.replaceAll(" ", "%20");
+    var url = Uri.parse(
+        'http://192.168.4.1/data?user=${appAdmin.id}&wifi=$wifiName&pass=$wifiPassword');
+    print(url);
+    http.read(url).then((value) {
+      if (value.trim() != "Failed") {
+        navigateAndReplace(context, MainScreen());
+        emit(SendToEspDone());
+      } else {
+        showToast("Error happened ,make sure Your WIFI and pass is correct ");
+        emit(SendToEspError());
+      }
+    }).catchError((e) {
+      showToast(
+          "Error happened ,make sure you connect to ESP wifi and try again");
+      print(e);
+      emit(SendToEspError());
+    });
+  }
+
+  void addGroup(BuildContext context) {
+    tableNameColumns = [];
+    tableNameRows = [];
+    tableNumberOfUnnamedColumns = 0;
+    renameRowsName = [];
+    navigateAndPush(context, AddGroup());
+    emit(AddGroupState());
   }
 
   void createTable(String value) {
@@ -449,140 +369,43 @@ class AppCubit extends Cubit<AppStates> {
     tableNameRows = [DataRow(cells: dCells1), DataRow(cells: dCells2)];
   }
 
-  void testLink(BuildContext context, String groupName, String link) {
-    emit(TestLinkLoading());
-    emit(CreateSpreadSheetLoading());
-    String id = link.split('/')[5];
-    var url = Uri.parse(
-        "https://script.google.com/macros/s/AKfycbzi7OBUEk5ZaBWeOjelTJMVMaJnK4zTU78UwB59qJW0GvJBnZ_daHmY_VPusN3xCZb0jw/exec?id=" +
-            id);
-    http.read(url).catchError((err) {
-      print(err);
-      showToast("Error happened while reading the data please try again");
-      emit(TestLinkError());
-    }).then((value) {
-      if (value.trim() == '-1') {
-        showToast(
-          "Invalid sheet please make sure that the url is public and editor",
-        );
-        emit(TestLinkError());
-      } else {
-        // Link Is Ok
-        createGroup(id, groupName, context);
-        emit(TestLinkDone());
-      }
-    });
+
+  void changeNeededColumns() {
+    emit(ChangeNeededColumnsState());
   }
 
-  void useSheetRowAsNameCheckBox(BuildContext context, String link) {
-    emit(UseSheetRowAsNameLoading());
+  void changeAddTab() {
     renameRowsName = [];
-    currentColumnToFill = 65;
-    if (useSheetRowAsName) {
-      useSheetRowAsName = !useSheetRowAsName;
-      String id = link.split('/')[5];
-      var url = Uri.parse(
-          "https://script.google.com/macros/s/AKfycbzi7OBUEk5ZaBWeOjelTJMVMaJnK4zTU78UwB59qJW0GvJBnZ_daHmY_VPusN3xCZb0jw/exec?id=" +
-              id);
-      http.read(url).catchError((err) {
-        print(err);
-        useSheetRowAsName = !useSheetRowAsName;
-        showToast("Error happened while reading the data please try again");
-        emit(UseSheetRowAsNameError());
-      }).then((value) {
-        if (value.trim() == '-1') {
-          useSheetRowAsName = !useSheetRowAsName;
-          showToast(
-              "Invalid sheet please make sure that the url is public and editor");
-          emit(UseSheetRowAsNameError());
-        } else {
-          createTable(value);
-          emit(UseSheetRowAsNameDone());
-        }
-      });
-    } else {
-      useSheetRowAsName = !useSheetRowAsName;
-      emit(UseSheetRowAsNameDone());
-    }
-  }
-
-  void changeAddTab(index) {
-    currentColumnToFill = 65;
-    renameRowsName = [];
-    addIndex = index;
     emit(ChangeAddTabState());
   }
-
-  void sendToEsp(BuildContext context, String wifiName, String wifiPassword) {
-    emit(SendToEspLoading());
-    wifiPassword = wifiPassword.replaceAll("#", "%23");
-    wifiPassword = wifiPassword.replaceAll("&", "%26");
-    wifiPassword = wifiPassword.replaceAll("\$", "%24");
-    wifiPassword = wifiPassword.replaceAll(" ", "%20");
-
-    wifiName = wifiName.replaceAll("#", "%23");
-    wifiName = wifiName.replaceAll("&", "%26");
-    wifiName = wifiName.replaceAll("\$", "%24");
-    wifiName = wifiName.replaceAll(" ", "%20");
-    var url = Uri.parse(
-        'http://192.168.4.1/data?user=${appUser.id}&wifi=$wifiName&pass=$wifiPassword');
-    print(url);
-    http.read(url).then((value) {
-      if (value.trim() != "Failed") {
-        navigateAndReplace(context, MainScreen());
-        emit(SendToEspDone());
-      } else {
-        showToast("Error happened ,make sure Your WIFI and pass is correct ");
-        emit(SendToEspError());
-      }
-    }).catchError((e) {
-      showToast(
-          "Error happened ,make sure you connect to ESP wifi and try again");
-      print(e);
-      emit(SendToEspError());
+  ///**********************************************/
+  Future<void> getFireData() async {
+    cardStudent = await _adminDataRepository.readAdminData();
+    _adminDataRepository.buildListener((student) {
+      cardStudent = student;
     });
   }
 
-  void addGroup(BuildContext context) {
-    addIndex = 0;
-    useSheetRowAsName = true;
-    tableNameColumns = [];
-    tableNameRows = [];
-    tableNumberOfUnnamedColumns = 0;
-    currentColumnToFill = 65;
-    renameRowsName = [];
-    navigateAndPush(context, AddGroup());
-    emit(AddGroupState());
-  }
-
-  signUp({
-    required BuildContext context,
-    required String phoneNumber,
-    required String userName,
-    required String password,
-  }) async {
-    appUser.id = userName;
-    emit(UserSignUpLoading());
-
-    DataSnapshot snapshot = await dataBase.child(appUser.id).get();
-
-    if (snapshot.exists) {
-      emit(UserSignUpError());
-      showToast("Sorry user name already exist");
-    } else {
-      dataBase.child(appUser.id).update({
-        'userNumber': phoneNumber,
-        'Password': password,
-        'nGroups': 0,
-        'lastID': 'NULL,NULL',
-        'data': ',,'
-      });
-    }
+  Future<void> createGroup(String id, String name, BuildContext context) async {
+    await _adminDataRepository.createGroup(GroupDetails(name: name, id: id));
+    navigateAndReplace(context, MainScreen());
   }
 
   void getInitialData(AppAdmin oldUser) async {
     if (!oldUser.isEmpty) {
-      appUser = oldUser;
+      appAdmin = oldUser;
+      getFireData();
     }
+  }
+
+  Future<void> deleteGroup(int groupIndex, BuildContext context) async {
+    emit(DeleteGroupLoading());
+    Navigator.of(context).pop();
+    await _adminDataRepository.deleteGroup(groups![groupIndex].name);
+    groups?.removeAt(groupIndex);
+  }
+
+  Future<void> getGroupNames() async {
+    groups = await _adminDataRepository.getGroupNames();
   }
 }

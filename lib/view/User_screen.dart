@@ -31,11 +31,10 @@ class UserScreen extends StatelessWidget {
                 color: Colors.white,
               ),
               onPressed: () {
-                if (cubit.userData['ID'].toString().isNotEmpty) {
+                if (cubit.showedUserData['ID'].toString().isNotEmpty) {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    cubit.editUserController = [];
                     return EditUserScreen(
-                        cubit.userData['ID'] ?? '-', groupIndex, true);
+                        cubit.showedUserData['ID'] ?? '-', groupIndex, true);
                   }));
                 }
               }),
@@ -76,7 +75,7 @@ class UserScreen extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ListView.separated(
-                        itemCount: cubit.userData.length + 1,
+                        itemCount: cubit.showedUserData.length + 1,
                         itemBuilder: (context, index) {
                           return inputBuilder(index - 1, context, cubit);
                         },
@@ -94,8 +93,6 @@ class UserScreen extends StatelessWidget {
 
   Widget inputBuilder(int index, BuildContext context, AppCubit cubit) {
     if (index == -1) {
-      print(cubit.userImageUrl);
-
       return Column(
         children: [
           Center(
@@ -125,7 +122,7 @@ class UserScreen extends StatelessWidget {
                           ),
                         );
                       },
-                      image: cubit.userImageUrl,
+                      image: cubit.showedUserData['userImageUrl'],
                     ),
                   ),
                 ),
@@ -134,9 +131,9 @@ class UserScreen extends StatelessWidget {
           ),
           Center(
             child: Text(
-              cubit.userData['Name'] == null
+              cubit.showedUserData['Name'] == null
                   ? "-"
-                  : cubit.userData['Name'].toString(),
+                  : cubit.showedUserData['Name'].toString(),
               style: TextStyle(
                   color: Colors.orange,
                   fontSize: 20,
@@ -147,7 +144,7 @@ class UserScreen extends StatelessWidget {
             height: 10,
           ),
           Text(
-            cubit.userData['ID'] == null ? "-" : 'ID : ${cubit.userData['ID']}',
+            cubit.showedUserData['ID'] == null ? "-" : 'ID : ${cubit.showedUserData['ID']}',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           SizedBox(
@@ -156,17 +153,17 @@ class UserScreen extends StatelessWidget {
         ],
       );
     }
-    if (cubit.userData.keys.toList()[index].trim() == 'Name' ||
-        cubit.userData.keys.toList()[index].trim() == 'ID') {
+    if (cubit.showedUserData.keys.toList()[index].trim() == 'Name' ||
+        cubit.showedUserData.keys.toList()[index].trim() == 'ID') {
       return Container();
     }
 
-    if (cubit.userData.keys.toList()[index].toString().contains('/')) {
+    if (cubit.showedUserData.keys.toList()[index].toString().contains('/')) {
       return Wrap(children: [
         Directionality(
           textDirection: TextDirection.rtl,
           child: Text(
-            ':  ${cubit.userData.keys.toList()[index]}',
+            ':  ${cubit.showedUserData.keys.toList()[index]}',
             style: TextStyle(
               color: ColorManager.darkGrey,
               fontWeight: FontWeight.bold,
@@ -178,7 +175,7 @@ class UserScreen extends StatelessWidget {
           width: 10,
         ),
         SelectableText(
-          cubit.userData.values.toList()[index].toString().isEmpty
+          cubit.showedUserData.values.toList()[index].toString().isEmpty
               ? 'absent'
               : 'done',
           style: TextStyle(fontSize: 15, color: Colors.blue),
@@ -188,7 +185,7 @@ class UserScreen extends StatelessWidget {
 
     return Wrap(children: [
       Text(
-        '${cubit.userData.keys.toList()[index]} : ',
+        '${cubit.showedUserData.keys.toList()[index]} : ',
         style: TextStyle(
           color: ColorManager.darkGrey,
           fontWeight: FontWeight.bold,
@@ -199,9 +196,9 @@ class UserScreen extends StatelessWidget {
         width: 10,
       ),
       SelectableText(
-        cubit.userData.values.toList()[index].toString().isEmpty
+        cubit.showedUserData.values.toList()[index].toString().isEmpty
             ? 'empty'
-            : '${cubit.userData.values.toList()[index]}',
+            : '${cubit.showedUserData.values.toList()[index]}',
         style: TextStyle(fontSize: 15, color: Colors.blue),
       ),
     ]);

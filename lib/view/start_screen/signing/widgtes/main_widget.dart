@@ -88,7 +88,7 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
             listener: (context, state) {
               if (state.status == AuthStatus.successLogIn) {
                 navigateAndReplace(context, MainScreen());
-                AppCubit.appUser = context.read<AuthStatusBloc>().user;
+                AppCubit.appAdmin = context.read<AuthStatusBloc>().user;
               } else if (state.status == AuthStatus.successSignUp) {
                 setState(() {
                   isLogin = true;

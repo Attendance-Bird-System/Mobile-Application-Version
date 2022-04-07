@@ -1,3 +1,4 @@
+import 'package:auto_id/model/module/students/card_student.dart';
 import 'package:auto_id/view/resources/color_manager.dart';
 import 'package:auto_id/view/start_screen/signing/login_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -70,7 +71,7 @@ class MainScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    cubit.currentUserId == "NULL" || cubit.currentUserId == ""
+                    cubit.cardStudent.state == StudentState.loading
                         ? Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
@@ -101,7 +102,7 @@ class MainScreen extends StatelessWidget {
                                 )),
                           )
                         : Container(
-                            child: cubit.currentUserState != "notfound"
+                            child: cubit.cardStudent.state != StudentState.newStudent
                                 ? Container(
                                     decoration: BoxDecoration(
                                         border:
@@ -122,7 +123,7 @@ class MainScreen extends StatelessWidget {
                                           ),
                                         ),
                                         state is FireDataGetting ||
-                                                cubit.groupsExist == false
+                                                cubit.groups != null
                                             ? Container(
                                                 width: double.infinity,
                                                 height: 180,
@@ -145,7 +146,7 @@ class MainScreen extends StatelessWidget {
                                                           children: [
                                                             Center(
                                                               child: Text(
-                                                                '${cubit.lastUserName}',
+                                                                '${cubit.cardStudent.name}',
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .orange,
@@ -160,17 +161,19 @@ class MainScreen extends StatelessWidget {
                                                               height: 10,
                                                             ),
                                                             Text(
-                                                                'Group : ${cubit.groupNames[cubit.lastUserGroupIndex - 1 == -1 ? 0 : cubit.lastUserGroupIndex - 1]}'),
+                                                                'Group : ${cubit.groups?[cubit.cardStudent.groupIndex ?? 0].name}'),
                                                             SizedBox(
                                                               height: 5,
                                                             ),
                                                             Text(
-                                                                'ID : ${cubit.currentUserId}'),
+                                                                'ID : ${cubit.cardStudent.id}'),
                                                             SizedBox(
                                                               height: 5,
                                                             ),
-                                                            cubit.currentUserState ==
-                                                                    "new"
+                                                            cubit.cardStudent
+                                                                        .state ==
+                                                                    StudentState
+                                                                        .notRegistered
                                                                 ? Wrap(
                                                                     crossAxisAlignment:
                                                                         WrapCrossAlignment
@@ -261,7 +264,7 @@ class MainScreen extends StatelessWidget {
                                                                   );
                                                                 },
                                                                 image:
-                                                                    '${cubit.currentUserGroupImageUrl}',
+                                                                    '${cubit.cardStudent.imgUrl}',
                                                               )),
                                                         ),
                                                       ),
@@ -293,7 +296,7 @@ class MainScreen extends StatelessWidget {
                                           ),
                                         ),
                                         if (state is FireDataGetting ||
-                                            cubit.groupsExist == false)
+                                            cubit.groups == null)
                                           Container(
                                             width: double.infinity,
                                             height: 150,
@@ -332,7 +335,7 @@ class MainScreen extends StatelessWidget {
                                                           height: 5,
                                                         ),
                                                         Text(
-                                                          'ID : ${cubit.currentUserId}',
+                                                          'ID : ${cubit.cardStudent.id}',
                                                           style: TextStyle(
                                                               color:
                                                                   ColorManager
@@ -416,7 +419,7 @@ class MainScreen extends StatelessWidget {
                                                                                 Expanded(
                                                                                   child: ListView.separated(
                                                                                       scrollDirection: Axis.horizontal,
-                                                                                      itemCount: cubit.groupLen,
+                                                                                      itemCount: cubit.groups?.length ?? 0,
                                                                                       itemBuilder: (context, index) {
                                                                                         return menuItemBuilder(index, context, cubit, state);
                                                                                       },
@@ -504,7 +507,7 @@ class MainScreen extends StatelessWidget {
                     state is GetGroupDataLoading
                         ? Center(child: CircularProgressIndicator())
                         : Container(
-                            child: cubit.groupLen == 0
+                            child: cubit.groups == null
                                 ? Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -525,7 +528,7 @@ class MainScreen extends StatelessWidget {
                                 : ListView.separated(
                                     shrinkWrap: true,
                                     physics: NeverScrollableScrollPhysics(),
-                                    itemCount: cubit.groupLen,
+                                    itemCount: cubit.groups!.length,
                                     itemBuilder: (context, index) {
                                       return groupItemBuilder(
                                           index, context, cubit, state);
@@ -546,7 +549,7 @@ class MainScreen extends StatelessWidget {
 
   Widget groupItemBuilder(
       int index, BuildContext context, AppCubit cubit, state) {
-    return (state is GetGroupNamesLoading && index + 1 == cubit.activeGroup)
+    return (state is GetGroupNamesLoading )
         ? Center(
             child: Padding(
             padding: const EdgeInsets.all(5.0),
@@ -568,7 +571,7 @@ class MainScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      cubit.groupNames[index],
+                      cubit.groups![index].name,
                       style: TextStyle(
                           color: Colors.orange,
                           fontSize: 30,
@@ -585,7 +588,7 @@ class MainScreen extends StatelessWidget {
       int index, BuildContext context, AppCubit cubit, state) {
     return Center(
       child: TextButton(
-          child: Text("${cubit.groupNames[index]}",
+          child: Text("${cubit.groups?[index].name}",
               style: TextStyle(color: Colors.orange, fontSize: 12)),
           style: ButtonStyle(
               padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(4)),
@@ -596,7 +599,6 @@ class MainScreen extends StatelessWidget {
                       side: BorderSide(color: Colors.orange)))),
           onPressed: () {
             cubit.goToEditUser(index + 1, context);
-            print(cubit.groupNames[index]);
           }),
     );
   }

@@ -6,6 +6,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/cubit.dart';
 import '../bloc/states.dart';
 
+List<String> neededColumnsNames = const [
+  "ID",
+  "Name",
+  "Gender",
+  "Department",
+  "Image",
+  "Phone",
+  "second-Phone",
+  "Email",
+  "LinkedIn",
+  "Facebook",
+  "Address"
+];
+
 // ignore: must_be_immutable
 class AddGroup extends StatelessWidget {
   var formKey = GlobalKey<FormState>();
@@ -14,6 +28,12 @@ class AddGroup extends StatelessWidget {
   var sheetLinkController = TextEditingController();
   var columnNameController = TextEditingController();
   var sheetNameController = TextEditingController();
+  int currentColumnToFill = 65;
+  int addIndex = 0;
+  List<bool> neededColumns =
+      List.generate(neededColumnsNames.length, (index) => index < 2);
+  List<String> renameRowsName = [];
+  bool useSheetRowAsName = true;
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +62,9 @@ class AddGroup extends StatelessWidget {
                         color: Colors.white,
                       ),
                 onPressed: () {
-                  if (cubit.addIndex == 0) {
+                  if (addIndex == 0) {
                     if (formKey3.currentState!.validate()) {
-                      cubit.getNamesFromBoolean();
+                      cubit.getNamesFromBoolean(neededColumns);
                       cubit
                           .createSpreadSheet(sheetNameController.text, context)
                           .then((value) {
@@ -55,11 +75,11 @@ class AddGroup extends StatelessWidget {
                     }
                   } else {
                     if (formKey.currentState!.validate()) {
-                      if (cubit.useSheetRowAsName) {
+                      if (useSheetRowAsName) {
                         cubit.testLink(context, sheetNameController.text,
                             sheetLinkController.text);
                       } else {
-                        if (cubit.renameRowsName.length ==
+                        if (renameRowsName.length ==
                             cubit.tableNumberOfUnnamedColumns) {
                           cubit.addColumnNames(
                               sheetLinkController.text.split('/')[5],
@@ -100,7 +120,8 @@ class AddGroup extends StatelessWidget {
                 ],
                 onTap: (index) {
                   //Handle button tap
-                  cubit.changeAddTab(index);
+                  addIndex = index;
+                  cubit.changeAddTab();
                 },
               ),
               appBar: AppBar(
@@ -108,7 +129,7 @@ class AddGroup extends StatelessWidget {
                 title: Text('Add Group'),
               ),
               body: Container(
-                child: cubit.addIndex == 0
+                child: addIndex == 0
                     ? Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: Container(
@@ -205,9 +226,10 @@ class AddGroup extends StatelessWidget {
                                           color: Colors.black54,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    value: cubit.neededColumns[2],
+                                    value: neededColumns[2],
                                     onChanged: (newValue) {
-                                      cubit.changeNeededColumns(2);
+                                      neededColumns[2] = !neededColumns[2];
+                                      cubit.changeNeededColumns();
                                     },
                                     controlAffinity: ListTileControlAffinity
                                         .leading, //  <-- leading Checkbox
@@ -221,9 +243,10 @@ class AddGroup extends StatelessWidget {
                                           color: Colors.black54,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    value: cubit.neededColumns[3],
+                                    value: neededColumns[3],
                                     onChanged: (newValue) {
-                                      cubit.changeNeededColumns(3);
+                                      neededColumns[3] = !neededColumns[3];
+                                      cubit.changeNeededColumns();
                                     },
                                     controlAffinity: ListTileControlAffinity
                                         .leading, //  <-- leading Checkbox
@@ -237,9 +260,10 @@ class AddGroup extends StatelessWidget {
                                           color: Colors.black54,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    value: cubit.neededColumns[4],
+                                    value: neededColumns[4],
                                     onChanged: (newValue) {
-                                      cubit.changeNeededColumns(4);
+                                      neededColumns[4] = !neededColumns[4];
+                                      cubit.changeNeededColumns();
                                     },
                                     controlAffinity: ListTileControlAffinity
                                         .leading, //  <-- leading Checkbox
@@ -253,9 +277,10 @@ class AddGroup extends StatelessWidget {
                                           color: Colors.black54,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    value: cubit.neededColumns[5],
+                                    value: neededColumns[5],
                                     onChanged: (newValue) {
-                                      cubit.changeNeededColumns(5);
+                                      neededColumns[5] = !neededColumns[5];
+                                      cubit.changeNeededColumns();
                                     },
                                     controlAffinity: ListTileControlAffinity
                                         .leading, //  <-- leading Checkbox
@@ -269,9 +294,10 @@ class AddGroup extends StatelessWidget {
                                           color: Colors.black54,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    value: cubit.neededColumns[6],
+                                    value: neededColumns[6],
                                     onChanged: (newValue) {
-                                      cubit.changeNeededColumns(6);
+                                      neededColumns[6] = !neededColumns[5];
+                                      cubit.changeNeededColumns();
                                     },
                                     controlAffinity: ListTileControlAffinity
                                         .leading, //  <-- leading Checkbox
@@ -285,9 +311,10 @@ class AddGroup extends StatelessWidget {
                                           color: Colors.black54,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    value: cubit.neededColumns[7],
+                                    value: neededColumns[7],
                                     onChanged: (newValue) {
-                                      cubit.changeNeededColumns(7);
+                                      neededColumns[7] = !neededColumns[7];
+                                      cubit.changeNeededColumns();
                                     },
                                     controlAffinity: ListTileControlAffinity
                                         .leading, //  <-- leading Checkbox
@@ -301,9 +328,10 @@ class AddGroup extends StatelessWidget {
                                           color: Colors.black54,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    value: cubit.neededColumns[8],
+                                    value: neededColumns[8],
                                     onChanged: (newValue) {
-                                      cubit.changeNeededColumns(8);
+                                      neededColumns[8] = !neededColumns[8];
+                                      cubit.changeNeededColumns();
                                     },
                                     controlAffinity: ListTileControlAffinity
                                         .leading, //  <-- leading Checkbox
@@ -317,9 +345,10 @@ class AddGroup extends StatelessWidget {
                                           color: Colors.black54,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    value: cubit.neededColumns[9],
+                                    value: neededColumns[9],
                                     onChanged: (newValue) {
-                                      cubit.changeNeededColumns(9);
+                                      neededColumns[9] = !neededColumns[9];
+                                      cubit.changeNeededColumns();
                                     },
                                     controlAffinity: ListTileControlAffinity
                                         .leading, //  <-- leading Checkbox
@@ -333,9 +362,10 @@ class AddGroup extends StatelessWidget {
                                           color: Colors.black54,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    value: cubit.neededColumns[10],
+                                    value: neededColumns[10],
                                     onChanged: (newValue) {
-                                      cubit.changeNeededColumns(10);
+                                      neededColumns[10] = !neededColumns[10];
+                                      cubit.changeNeededColumns();
                                     },
                                     controlAffinity: ListTileControlAffinity
                                         .leading, //  <-- leading Checkbox
@@ -412,7 +442,7 @@ class AddGroup extends StatelessWidget {
                                               }
                                             },
                                             decoration: InputDecoration(
-                                              enabled: cubit.useSheetRowAsName,
+                                              enabled: useSheetRowAsName,
                                               labelText: "Sheet Link",
                                               prefixIcon: Icon(Icons.link),
                                               enabledBorder: OutlineInputBorder(
@@ -435,13 +465,14 @@ class AddGroup extends StatelessWidget {
                                                     fontWeight:
                                                         FontWeight.bold),
                                               ),
-                                              value: cubit.useSheetRowAsName,
+                                              value: useSheetRowAsName,
                                               onChanged: (newValue) {
                                                 if (formKey.currentState!
                                                     .validate()) {
                                                   cubit
                                                       .useSheetRowAsNameCheckBox(
                                                           context,
+                                                          useSheetRowAsName,
                                                           sheetLinkController
                                                               .text);
                                                 }
@@ -458,7 +489,7 @@ class AddGroup extends StatelessWidget {
                                     child: state is UseSheetRowAsNameLoading
                                         ? Center(
                                             child: CircularProgressIndicator())
-                                        : cubit.useSheetRowAsName == true
+                                        : useSheetRowAsName == true
                                             ? Container()
                                             : Column(
                                                 crossAxisAlignment:
@@ -494,7 +525,7 @@ class AddGroup extends StatelessWidget {
                                                         decoration:
                                                             InputDecoration(
                                                           labelText:
-                                                              "Column ${String.fromCharCode(cubit.currentColumnToFill)} name",
+                                                              "Column ${String.fromCharCode(currentColumnToFill)} name",
                                                           prefixIcon: Icon(Icons
                                                               .file_copy_outlined),
                                                           suffixIcon:
@@ -507,6 +538,7 @@ class AddGroup extends StatelessWidget {
                                                                       cubit.addRowName(
                                                                           columnNameController
                                                                               .text,
+                                                                          currentColumnToFill,
                                                                           context);
                                                                     }
                                                                     columnNameController
