@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
-import '../bloc/cubit.dart';
-import '../bloc/states.dart';
+import '../../bloc/admin_cubit.dart';
+import '../../bloc/admin_states.dart';
 
 // ignore: must_be_immutable
 class EditUserScreen extends StatelessWidget {
@@ -23,10 +23,10 @@ class EditUserScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AppCubit, AppStates>(
-      listener: (BuildContext context, AppStates state) {},
-      builder: (BuildContext context, AppStates state) {
-        AppCubit cubit = AppCubit.get(context);
+    return BlocConsumer<AdminCubit, AdminCubitStates>(
+      listener: (BuildContext context, AdminCubitStates state) {},
+      builder: (BuildContext context, AdminCubitStates state) {
+        AdminCubit cubit = AdminCubit.get(context);
         if (dataHere && typeAheadController.text.isEmpty) {
           typeAheadController.text = cubit.showedUserData['Name'];
         }
@@ -168,7 +168,7 @@ class EditUserScreen extends StatelessWidget {
     );
   }
 
-  Widget inputBuilder(int index, AppCubit cubit, AppStates state) {
+  Widget inputBuilder(int index, AdminCubit cubit, AdminCubitStates state) {
     if (editUserController.length <
         (cubit.groups?[groupIndex].columnNames?.length ?? 0)) {
       editUserController.add(TextEditingController());

@@ -1,10 +1,10 @@
-import '../shared/functions/dialogs.dart';
+import '../../view/shared/functions/dialogs.dart';
 import 'package:auto_id/view/resources/color_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/cubit.dart';
-import '../bloc/states.dart';
+import '../../bloc/admin_cubit.dart';
+import '../../bloc/admin_states.dart';
 import 'edit_user.dart';
 
 // ignore: must_be_immutable
@@ -19,10 +19,10 @@ class UserScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AppCubit, AppStates>(
-      listener: (BuildContext context, AppStates state) {},
-      builder: (BuildContext context, AppStates state) {
-        AppCubit cubit = AppCubit.get(context);
+    return BlocConsumer<AdminCubit, AdminCubitStates>(
+      listener: (BuildContext context, AdminCubitStates state) {},
+      builder: (BuildContext context, AdminCubitStates state) {
+        AdminCubit cubit = AdminCubit.get(context);
 
         return Scaffold(
           floatingActionButton: FloatingActionButton(
@@ -91,7 +91,7 @@ class UserScreen extends StatelessWidget {
     );
   }
 
-  Widget inputBuilder(int index, BuildContext context, AppCubit cubit) {
+  Widget inputBuilder(int index, BuildContext context, AdminCubit cubit) {
     if (index == -1) {
       return Column(
         children: [

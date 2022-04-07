@@ -1,12 +1,12 @@
 import 'package:flutter/services.dart';
 
-import '../shared/functions/dialogs.dart';
+import '../../view/shared/functions/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/cubit.dart';
-import '../bloc/states.dart';
-import '../shared/widgets/toast_helper.dart';
+import '../../bloc/admin_cubit.dart';
+import '../../bloc/admin_states.dart';
+import '../../view/shared/widgets/toast_helper.dart';
 
 // ignore: must_be_immutable
 class GroupScreen extends StatelessWidget {
@@ -18,10 +18,10 @@ class GroupScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AppCubit, AppStates>(
-      listener: (BuildContext context, AppStates state) {},
-      builder: (BuildContext context, AppStates state) {
-        AppCubit cubit = AppCubit.get(context);
+    return BlocConsumer<AdminCubit, AdminCubitStates>(
+      listener: (BuildContext context, AdminCubitStates state) {},
+      builder: (BuildContext context, AdminCubitStates state) {
+        AdminCubit cubit = AdminCubit.get(context);
 
         return Scaffold(
             appBar: AppBar(
@@ -93,8 +93,8 @@ class GroupScreen extends StatelessWidget {
     );
   }
 
-  Widget groupItemBuilder(
-      int index, BuildContext context, AppCubit cubit, int groupIndex, state) {
+  Widget groupItemBuilder(int index, BuildContext context, AdminCubit cubit,
+      int groupIndex, state) {
     return state is GetGroupPersonLoading
         ? Center(
             child: Padding(

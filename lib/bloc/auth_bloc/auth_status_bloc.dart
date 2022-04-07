@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../model/module/users/app_admin.dart';
+import '../../model/module/app_admin.dart';
 import '../../model/repository/auth_repository.dart';
-import '../../shared/widgets/toast_helper.dart';
+import '../../view/shared/widgets/toast_helper.dart';
 
 part 'auth_status_event.dart';
 part 'auth_status_state.dart';

@@ -1,4 +1,4 @@
-import 'package:auto_id/shared/functions/navigation_functions.dart';
+import 'package:auto_id/view/shared/functions/navigation_functions.dart';
 import 'package:auto_id/view/resources/color_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:onboarding/onboarding.dart';

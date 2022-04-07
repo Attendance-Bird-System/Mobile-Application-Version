@@ -1,26 +1,26 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:auto_id/model/module/group_details.dart';
-import 'package:auto_id/model/module/students/card_student.dart';
+import '../model/module/card_student.dart';
 import 'package:auto_id/model/repository/realtime_firebase.dart';
 
-import '../model/module/users/app_admin.dart';
+import '../model/module/app_admin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 
-import '../shared/functions/navigation_functions.dart';
-import '../shared/widgets/toast_helper.dart';
-import '../view/User_screen.dart';
-import '../view/add_group.dart';
-import '../view/edit_user.dart';
-import '../view/group_screen.dart';
-import '../view/main_screen.dart';
-import 'states.dart';
+import '../view/shared/functions/navigation_functions.dart';
+import '../view/shared/widgets/toast_helper.dart';
+import '../view/ui/User_screen.dart';
+import '../view/ui/add_group.dart';
+import '../view/ui/edit_user.dart';
+import '../view/ui/group_screen.dart';
+import '../view/ui/main_screen.dart';
+import 'admin_states.dart';
 
-class AppCubit extends Cubit<AppStates> {
-  AppCubit() : super(AppInitial());
-  static AppCubit get(context) => BlocProvider.of(context);
+class AdminCubit extends Cubit<AdminCubitStates> {
+  AdminCubit() : super(AppInitial());
+  static AdminCubit get(context) => BlocProvider.of(context);
 
   static AppAdmin appAdmin = AppAdmin.empty;
   AdminDataRepository _adminDataRepository = AdminDataRepository();

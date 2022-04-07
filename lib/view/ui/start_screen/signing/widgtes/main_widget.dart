@@ -1,14 +1,15 @@
 import 'dart:ui';
 
+import '../../../../../model/module/app_admin.dart';
 import 'package:auto_id/view/resources/color_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../../../../bloc/auth_bloc/auth_status_bloc.dart';
-import '../../../../bloc/cubit.dart';
+import '../../../../../bloc/auth_bloc/auth_status_bloc.dart';
+import '../../../../../bloc/admin_cubit.dart';
 import '../../../../shared/functions/navigation_functions.dart';
-import '../../../main_screen.dart';
+import '../../../../ui/main_screen.dart';
 import 'clip_pathes.dart';
 import 'forget_pass_dialog.dart';
 import 'form_field.dart';
@@ -24,8 +25,10 @@ class MainLoginWidget extends StatefulWidget {
 class _MainLoginWidgetState extends State<MainLoginWidget> {
   bool isLogin = true;
   bool showPassText = true;
-  var emailController = TextEditingController();
-  var passController = TextEditingController();
+  var logInEmailController = TextEditingController();
+  var signUpEmailController = TextEditingController();
+  var logInPassController = TextEditingController();
+  var signUpPassController = TextEditingController();
   var passCheckerController = TextEditingController();
   var loginGlobalKey = GlobalKey<FormState>();
   var signUpGlobalKey = GlobalKey<FormState>();
@@ -88,7 +91,8 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
             listener: (context, state) {
               if (state.status == AuthStatus.successLogIn) {
                 navigateAndReplace(context, MainScreen());
-                AppCubit.appAdmin = context.read<AuthStatusBloc>().user;
+                AppAdmin appAdmin = context.read<AuthStatusBloc>().user;
+                AdminCubit.get(context).getInitialData(appAdmin);
               } else if (state.status == AuthStatus.successSignUp) {
                 setState(() {
                   isLogin = true;
@@ -133,7 +137,7 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
                         children: [
                           DefaultFormField(
                             prefix: Icons.mail,
-                            controller: emailController,
+                            controller: logInEmailController,
                             fillHint: AutofillHints.email,
                             title: "Email Address",
                             validator: (value) {
@@ -149,7 +153,7 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
                           ),
                           DefaultFormField(
                             prefix: Icons.lock,
-                            controller: passController,
+                            controller: logInPassController,
                             fillHint: AutofillHints.password,
                             title: "Password",
                             isPass: !showPassText,
@@ -227,7 +231,7 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
                           ), () {
                   if (loginGlobalKey.currentState!.validate()) {
                     context.read<AuthStatusBloc>().add(LoginInUsingEmailEvent(
-                        emailController.text, passController.text));
+                        logInEmailController.text, logInPassController.text));
                   }
                 }),
                 const SizedBox(
@@ -314,7 +318,7 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
                         children: [
                           DefaultFormField(
                             prefix: Icons.mail,
-                            controller: emailController,
+                            controller: signUpEmailController,
                             fillHint: AutofillHints.email,
                             title: "Email Address",
                             validator: (value) {
@@ -330,7 +334,7 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
                           ),
                           DefaultFormField(
                             prefix: Icons.lock,
-                            controller: passController,
+                            controller: signUpPassController,
                             fillHint: AutofillHints.newPassword,
                             title: "Password",
                             isPass: !showPassText,
@@ -365,7 +369,7 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
                             validator: (value) {
                               if (value!.isEmpty) {
                                 return 'password cannot be empty';
-                              } else if (value != passController.text) {
+                              } else if (value != signUpPassController.text) {
                                 return 'Password must be the same';
                               } else {
                                 return null;
@@ -401,7 +405,7 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
                           ), () {
                   if (signUpGlobalKey.currentState!.validate()) {
                     context.read<AuthStatusBloc>().add(SignUpInUsingEmailEvent(
-                        emailController.text, passController.text));
+                        signUpEmailController.text, signUpPassController.text));
                   }
                 }),
               ],
@@ -459,9 +463,6 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
       );
 
   void changeScreenMode() {
-    passCheckerController.clear();
-    passController.clear();
-    emailController.clear();
     showPassText = false;
     isLogin = !isLogin;
     setState(() {});

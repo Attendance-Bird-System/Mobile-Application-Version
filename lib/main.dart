@@ -1,8 +1,8 @@
-import 'model/module/users/app_admin.dart';
-import 'package:auto_id/view/main_screen.dart';
+import 'model/module/app_admin.dart';
+import 'view/ui/main_screen.dart';
 import 'package:auto_id/view/resources/color_manager.dart';
 import 'package:auto_id/view/resources/string_manager.dart';
-import 'package:auto_id/view/start_screen/onboarding/on_boarding_screen.dart';
+import 'package:auto_id/view/ui/start_screen/onboarding/on_boarding_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -10,14 +10,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'bloc/auth_bloc/auth_status_bloc.dart';
 
-import 'bloc/cubit.dart';
+import 'bloc/admin_cubit.dart';
 import 'model/local/pref_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.orange, // status bar color
+    statusBarColor: ColorManager.mainOrange,
   ));
   await Firebase.initializeApp();
   await PreferenceRepository.initializePreference();
@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => AuthStatusBloc()),
-        BlocProvider(create: (_) => AppCubit()..getInitialData(user)),
+        BlocProvider(create: (_) => AdminCubit()..getInitialData(user)),
       ],
       child: MaterialApp(
         title: StringManger.appName,

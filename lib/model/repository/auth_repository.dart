@@ -1,9 +1,9 @@
-import 'package:auto_id/shared/widgets/toast_helper.dart';
+import 'package:auto_id/view/shared/widgets/toast_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import '../module/users/app_admin.dart';
+import '../module/app_admin.dart';
 
 class AuthRepository {
   final FirebaseAuth auth;
@@ -115,6 +115,10 @@ class FireBaseAuthErrors implements Exception {
       case 'invalid-email':
         return const FireBaseAuthErrors(
           'Email is not valid or badly formatted.',
+        );
+      case 'Email not verified':
+        return const FireBaseAuthErrors(
+          'Email is not verified. please check it.',
         );
       case 'user-disabled':
         return const FireBaseAuthErrors(

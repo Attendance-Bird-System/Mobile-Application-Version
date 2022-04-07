@@ -1,23 +1,23 @@
-import 'package:auto_id/model/module/students/card_student.dart';
+import '../../model/module/card_student.dart';
 import 'package:auto_id/view/resources/color_manager.dart';
-import 'package:auto_id/view/start_screen/signing/login_screen.dart';
+import 'package:auto_id/view/ui/start_screen/signing/login_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/cubit.dart';
-import '../bloc/states.dart';
-import '../shared/functions/navigation_functions.dart';
+import '../../bloc/admin_cubit.dart';
+import '../../bloc/admin_states.dart';
+import '../../view/shared/functions/navigation_functions.dart';
 import 'esp_config.dart';
 
 // ignore: must_be_immutable
 class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AppCubit, AppStates>(
-      listener: (BuildContext context, AppStates state) {},
-      builder: (BuildContext context, AppStates state) {
-        AppCubit cubit = AppCubit.get(context);
+    return BlocConsumer<AdminCubit, AdminCubitStates>(
+      listener: (BuildContext context, AdminCubitStates state) {},
+      builder: (BuildContext context, AdminCubitStates state) {
+        AdminCubit cubit = AdminCubit.get(context);
 
         // if (cubit.groupsExist == false && !(state is GetGroupDataLoading)) {
         //   cubit.getGroupNames();
@@ -548,7 +548,7 @@ class MainScreen extends StatelessWidget {
   }
 
   Widget groupItemBuilder(
-      int index, BuildContext context, AppCubit cubit, state) {
+      int index, BuildContext context, AdminCubit cubit, state) {
     return (state is GetGroupNamesLoading )
         ? Center(
             child: Padding(
@@ -585,7 +585,7 @@ class MainScreen extends StatelessWidget {
   }
 
   Widget menuItemBuilder(
-      int index, BuildContext context, AppCubit cubit, state) {
+      int index, BuildContext context, AdminCubit cubit, state) {
     return Center(
       child: TextButton(
           child: Text("${cubit.groups?[index].name}",
