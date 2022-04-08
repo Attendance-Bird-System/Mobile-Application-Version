@@ -94,7 +94,7 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
           BlocListener<AuthStatusBloc, AuthStates>(
             listener: (context, state) {
               if (state.status == AuthStatus.successLogIn) {
-                navigateAndReplace(context, const MainScreen());
+                navigateAndReplace(context, MainScreen());
                 AppAdmin appAdmin = context.read<AuthStatusBloc>().user;
                 context
                     .read<AdminDataBloc>()

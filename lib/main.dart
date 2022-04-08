@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.orange,
           primaryColor: ColorManager.mainOrange,
         ),
-        home: user.isEmpty ? OnBoardingView() : const MainScreen(),
+        home: user.isEmpty ? OnBoardingView() : MainScreen(),
       ),
     );
   }

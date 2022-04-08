@@ -36,19 +36,21 @@ class AdminCubit extends Cubit<AdminCubitStates> {
   int tableNumberOfUnnamedColumns = 0;
   List<String> renameRowsName = [];
 
+  /// done deleteStudentFromSheet
   void deleteUser(int userIndex, int groupIndex, BuildContext context) {
     emit(DeletePersonLoading());
     var url = Uri.parse(
         "https://script.google.com/macros/s/AKfycbxx3WO2ZZQ0jSInhHwsl6p3ZvnM4NAVP-ka0ecbqkZJRnOlj8G7qTyvZcZdknsQGvk/exec?fun=remove&group=$groupIndex&person_id=$userIndex&userName=${appAdmin.id}");
     http.read(url).then((value) {
       emit(DeletePersonDone());
-      navigateAndReplace(context, const MainScreen());
+      navigateAndReplace(context, MainScreen());
     }).catchError((onError) {
       showToast("Error at deleting");
       emit(DeletePersonError());
     });
   }
 
+  /// done sendStudentNewData
   void sendEditData(
       int groupIndex, String id, Map dataToSent, BuildContext context) {
     emit(SendToEditLoading());
@@ -67,12 +69,13 @@ class AdminCubit extends Cubit<AdminCubitStates> {
             state: StudentState.notRegistered);
         _adminDataRepository.updateCardState();
       }
-      navigateAndReplace(context, const MainScreen());
+      navigateAndReplace(context, MainScreen());
     }).catchError((err) {
       emit(SendToEditError());
     });
   }
 
+  /// done getUserData
   void goToUser(int groupIndex, int userIndex, BuildContext context) {
     showedUserData = {};
     emit(GetGroupPersonLoading());
@@ -111,6 +114,30 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     });
   }
 
+  /// done getUserData
+  void getUserData(int groupIndex, int userIndex, BuildContext context) {
+    showedUserData = {};
+    emit(GetGroupPersonLoading());
+    var url = Uri.parse(
+        "https://script.google.com/macros/s/AKfycbzAWq8QxQDISfOGFEougyd4gK29jQr3SWRUbDBgAR4Q6E-rekQbHqkrouqkidbG5SY/exec?"
+        "userName=${appAdmin.id}"
+        "&group=$groupIndex"
+        "&index=${userIndex + 1}");
+    http.read(url).catchError((err) {
+      emit(GetGroupPersonError());
+    }).then((value) {
+      if (!value.startsWith('<!DOCTYPE')) {
+        value = '{"$value"}';
+        value = value.replaceAll(',', '","');
+        value = value.replaceAll('https":"', "https:");
+        value = value.replaceAll('http":"', "http:");
+        showedUserData = json.decode(value);
+      }
+      emit(GetGroupPersonDone());
+    });
+  }
+
+  /// done getGroupData
   void goToEditUser(int index, BuildContext context) {
     emit(GoToEditUserLoading());
     if (groups?[index].columnNames == null) {
@@ -137,28 +164,7 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     }
   }
 
-  void getUserData(int groupIndex, int userIndex, BuildContext context) {
-    showedUserData = {};
-    emit(GetGroupPersonLoading());
-    var url = Uri.parse(
-        "https://script.google.com/macros/s/AKfycbzAWq8QxQDISfOGFEougyd4gK29jQr3SWRUbDBgAR4Q6E-rekQbHqkrouqkidbG5SY/exec?"
-        "userName=${appAdmin.id}"
-        "&group=$groupIndex"
-        "&index=${userIndex + 1}");
-    http.read(url).catchError((err) {
-      emit(GetGroupPersonError());
-    }).then((value) {
-      if (!value.startsWith('<!DOCTYPE')) {
-        value = '{"$value"}';
-        value = value.replaceAll(',', '","');
-        value = value.replaceAll('https":"', "https:");
-        value = value.replaceAll('http":"', "http:");
-        showedUserData = json.decode(value);
-      }
-      emit(GetGroupPersonDone());
-    });
-  }
-
+  /// done getGroupData
   void getGroupNamesData(int index, BuildContext context) {
     emit(GetGroupNamesLoading());
     if (groups?[index].columnNames == null) {
@@ -183,15 +189,7 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     }
   }
 
-  void getNamesFromBoolean(List<bool> neededColumns) {
-    renameRowsName = [];
-    for (int i = 0; i < 11; i++) {
-      if (neededColumns[i]) {
-        renameRowsName.add(neededColumnsNames[i]);
-      }
-    }
-  }
-
+  /// done addColumnNames
   void addColumnNames(String id, String groupName, BuildContext context) {
     // run the script to make a column with the id
     var url = Uri.parse(
@@ -205,6 +203,7 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     });
   }
 
+  /// done createSpreadSheet
   Future<String> createSpreadSheet(String groupName, BuildContext context) {
     emit(CreateSpreadSheetLoading());
     var url = Uri.parse(
@@ -226,6 +225,7 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     }
   }
 
+  /// done testSheetLink
   void testLink(BuildContext context, String groupName, String link) {
     emit(TestLinkLoading());
     emit(CreateSpreadSheetLoading());
@@ -250,6 +250,7 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     });
   }
 
+  /// done testSheetLink
   void useSheetRowAsNameCheckBox(
       BuildContext context, bool useSheetRowAsName, String link) {
     emit(UseSheetRowAsNameLoading());
@@ -281,6 +282,16 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     }
   }
 
+  void getNamesFromBoolean(List<bool> neededColumns) {
+    renameRowsName = [];
+    for (int i = 0; i < 11; i++) {
+      if (neededColumns[i]) {
+        renameRowsName.add(neededColumnsNames[i]);
+      }
+    }
+  }
+
+  /// done sendCredentialsToEsp
   void sendToEsp(BuildContext context, String wifiName, String wifiPassword) {
     emit(SendToEspLoading());
     wifiPassword = wifiPassword.replaceAll("#", "%23");
@@ -296,7 +307,7 @@ class AdminCubit extends Cubit<AdminCubitStates> {
         'http://192.168.4.1/data?user=${appAdmin.id}&wifi=$wifiName&pass=$wifiPassword');
     http.read(url).then((value) {
       if (value.trim() != "Failed") {
-        navigateAndReplace(context, const MainScreen());
+        navigateAndReplace(context, MainScreen());
         emit(SendToEspDone());
       } else {
         showToast("Error happened ,make sure Your WIFI and pass is correct ");
@@ -364,7 +375,7 @@ class AdminCubit extends Cubit<AdminCubitStates> {
 
   Future<void> createGroup(String id, String name, BuildContext context) async {
     await _adminDataRepository.createGroup(GroupDetails(name: name, id: id));
-    navigateAndReplace(context, const MainScreen());
+    navigateAndReplace(context, MainScreen());
   }
 
   Future<void> deleteGroup(int groupIndex, BuildContext context) async {

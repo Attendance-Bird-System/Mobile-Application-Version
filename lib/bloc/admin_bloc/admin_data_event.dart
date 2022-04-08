@@ -11,9 +11,6 @@ class StartDataOperations extends AdminDataEvent {
   final AppAdmin currentUser;
 
   const StartDataOperations(this.currentUser);
-
-  @override
-  List<Object?> get props => [currentUser.id];
 }
 
 class CardDataChangedEvents extends AdminDataEvent {
