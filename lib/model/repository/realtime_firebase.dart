@@ -1,18 +1,18 @@
 import 'dart:async';
 
-import 'package:auto_id/bloc/admin_cubit.dart';
 import 'package:auto_id/model/module/group_details.dart';
 import 'package:firebase_database/firebase_database.dart';
 
+import '../../bloc/admin_bloc/admin_data_bloc.dart';
 import '../module/card_student.dart';
 
 class AdminDataRepository {
   final DatabaseReference _dataBase = FirebaseDatabase.instance.ref();
-  StreamSubscription? listener;
+  StreamSubscription? _listener;
 
   Future<CardStudent> readAdminData() async {
     DataSnapshot snap =
-        await _dataBase.child(AdminCubit.appAdmin.id).child("lastCard").get();
+        await _dataBase.child(AdminDataBloc.admin.id).child("lastCard").get();
     if (snap.exists) {
       return CardStudent.fromFireBase(snap.value);
     } else {
@@ -22,7 +22,7 @@ class AdminDataRepository {
 
   Future<List<GroupDetails>> getGroupNames() async {
     DataSnapshot snap =
-        await _dataBase.child(AdminCubit.appAdmin.id).child("groups").get();
+        await _dataBase.child(AdminDataBloc.admin.id).child("groups").get();
     if (snap.exists) {
       return snap.children
           .map((e) =>
@@ -35,7 +35,7 @@ class AdminDataRepository {
 
   Future<void> deleteGroup(String groupName) async {
     await _dataBase
-        .child(AdminCubit.appAdmin.id)
+        .child(AdminDataBloc.admin.id)
         .child("groups")
         .child(groupName)
         .remove();
@@ -43,30 +43,30 @@ class AdminDataRepository {
 
   Future<void> updateCardState() async {
     await _dataBase
-        .child(AdminCubit.appAdmin.id)
+        .child(AdminDataBloc.admin.id)
         .child("lastCard")
         .update({"state": "problem"});
   }
 
   Future<void> createGroup(GroupDetails group) async {
     await _dataBase
-        .child(AdminCubit.appAdmin.id)
+        .child(AdminDataBloc.admin.id)
         .child("groups")
         .update({group.name: group.id});
   }
 
-  Future<void> buildListener(Function(CardStudent student) onData) async {
+  Future<void> buildListener(Function(String key, dynamic value) onData) async {
     await cancelListener();
-    listener = _dataBase
-        .child(AdminCubit.appAdmin.id)
+    _listener = _dataBase
+        .child(AdminDataBloc.admin.id)
         .child("lastCard")
         .onChildChanged
         .listen((event) {
-      onData(CardStudent.fromFireBase(event.snapshot.value));
+      onData(event.snapshot.key!, event.snapshot.value);
     });
   }
 
   Future<void> cancelListener() async {
-    if (listener != null) await listener?.cancel();
+    if (_listener != null) await _listener?.cancel();
   }
 }

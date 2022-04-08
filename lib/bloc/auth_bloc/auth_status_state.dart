@@ -18,7 +18,7 @@ class AuthStates extends Equatable {
   const AuthStates({required this.status, this.changeUi = false});
 
   factory AuthStates.initial() {
-    return AuthStates(status: AuthStatus.initial, changeUi: false);
+    return const AuthStates(status: AuthStatus.initial, changeUi: false);
   }
 
   @override

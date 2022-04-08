@@ -12,7 +12,7 @@ class UserScreen extends StatelessWidget {
   late int groupIndex;
   late int userIndex;
 
-  UserScreen(int indexUser, int indexGroup) {
+  UserScreen(int indexUser, int indexGroup, {Key? key}) : super(key: key) {
     userIndex = indexUser;
     groupIndex = indexGroup;
   }
@@ -26,7 +26,7 @@ class UserScreen extends StatelessWidget {
 
         return Scaffold(
           floatingActionButton: FloatingActionButton(
-              child: Icon(
+              child: const Icon(
                 Icons.edit,
                 color: Colors.white,
               ),
@@ -40,12 +40,12 @@ class UserScreen extends StatelessWidget {
               }),
           appBar: AppBar(
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(
                   bottom: Radius.circular(15),
                 ),
               ),
-              title: Text(
+              title: const Text(
                 'User Information',
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -53,12 +53,11 @@ class UserScreen extends StatelessWidget {
               actions: [
                 IconButton(
                   icon: state is DeletePersonLoading
-                      ? CircularProgressIndicator(
+                      ? const CircularProgressIndicator(
                           color: Colors.white,
                         )
-                      : Icon(Icons.restore_from_trash_outlined),
+                      : const Icon(Icons.restore_from_trash_outlined),
                   onPressed: () {
-                    //print(userIndex);
                     customChoiceDialog(context,
                         title: "Warning",
                         content: "Are you sure you want to delete user ",
@@ -69,7 +68,7 @@ class UserScreen extends StatelessWidget {
                 )
               ]),
           body: state is GetGroupPersonLoading
-              ? Center(child: CircularProgressIndicator())
+              ? const Center(child: CircularProgressIndicator())
               : Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Padding(
@@ -80,7 +79,7 @@ class UserScreen extends StatelessWidget {
                           return inputBuilder(index - 1, context, cubit);
                         },
                         separatorBuilder: (context, index) {
-                          return SizedBox(
+                          return const SizedBox(
                             height: 15,
                           );
                         }),
@@ -115,7 +114,7 @@ class UserScreen extends StatelessWidget {
                         error,
                         stackTrace,
                       ) {
-                        return Container(
+                        return SizedBox(
                           height: 150,
                           child: Center(
                             child: Image.asset('images/avatar.png'),
@@ -134,22 +133,22 @@ class UserScreen extends StatelessWidget {
               cubit.showedUserData['Name'] == null
                   ? "-"
                   : cubit.showedUserData['Name'].toString(),
-              style: TextStyle(
+              style: const TextStyle(
                   color: Colors.orange,
                   fontSize: 20,
                   fontWeight: FontWeight.bold),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Text(
             cubit.showedUserData['ID'] == null
                 ? "-"
                 : 'ID : ${cubit.showedUserData['ID']}',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
         ],
@@ -166,21 +165,21 @@ class UserScreen extends StatelessWidget {
           textDirection: TextDirection.rtl,
           child: Text(
             ':  ${cubit.showedUserData.keys.toList()[index]}',
-            style: TextStyle(
+            style: const TextStyle(
               color: ColorManager.darkGrey,
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           width: 10,
         ),
         SelectableText(
           cubit.showedUserData.values.toList()[index].toString().isEmpty
               ? 'absent'
               : 'done',
-          style: TextStyle(fontSize: 15, color: Colors.blue),
+          style: const TextStyle(fontSize: 15, color: Colors.blue),
         ),
       ]);
     }
@@ -188,20 +187,20 @@ class UserScreen extends StatelessWidget {
     return Wrap(children: [
       Text(
         '${cubit.showedUserData.keys.toList()[index]} : ',
-        style: TextStyle(
+        style: const TextStyle(
           color: ColorManager.darkGrey,
           fontWeight: FontWeight.bold,
           fontSize: 18,
         ),
       ),
-      SizedBox(
+      const SizedBox(
         width: 10,
       ),
       SelectableText(
         cubit.showedUserData.values.toList()[index].toString().isEmpty
             ? 'empty'
             : '${cubit.showedUserData.values.toList()[index]}',
-        style: TextStyle(fontSize: 15, color: Colors.blue),
+        style: const TextStyle(fontSize: 15, color: Colors.blue),
       ),
     ]);
   }

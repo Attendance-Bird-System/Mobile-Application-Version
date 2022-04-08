@@ -12,6 +12,8 @@ class SheetFeatures extends StatelessWidget {
   var formKey = GlobalKey<FormState>();
   bool hidePassword = false;
 
+  SheetFeatures({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AdminCubit, AdminCubitStates>(
@@ -29,15 +31,15 @@ class SheetFeatures extends StatelessWidget {
           child: Scaffold(
             resizeToAvoidBottomInset: false,
             body: state is CheckUserStateLoading
-                ? Center(child: CircularProgressIndicator())
-                : Container(
+                ? const Center(child: CircularProgressIndicator())
+                : SizedBox(
                     width: double.infinity,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         upperTriangle(context),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
+                        const Padding(
+                          padding: EdgeInsets.all(10.0),
                           child: Text(
                             'Change the ESP WIFI Configuration',
                             style: TextStyle(
@@ -46,8 +48,8 @@ class SheetFeatures extends StatelessWidget {
                                 color: ColorManager.darkGrey),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
                           child: Text(
                             'Connect to wifi ESP with password <88888888>',
                             style: TextStyle(
@@ -62,7 +64,7 @@ class SheetFeatures extends StatelessWidget {
                           child: Form(
                             key: formKey,
                             child: Container(
-                              padding: EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
                                 color: Colors.grey.withOpacity(0.15),
@@ -83,7 +85,7 @@ class SheetFeatures extends StatelessWidget {
                                       },
                                       decoration: InputDecoration(
                                         labelText: "WIFI name",
-                                        prefixIcon: Icon(Icons.wifi),
+                                        prefixIcon: const Icon(Icons.wifi),
                                         enabledBorder: OutlineInputBorder(
                                           borderSide: const BorderSide(
                                               color: Colors.orange, width: 2.0),
@@ -91,7 +93,7 @@ class SheetFeatures extends StatelessWidget {
                                               BorderRadius.circular(25.0),
                                         ),
                                       )),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
                                   TextFormField(
@@ -106,13 +108,12 @@ class SheetFeatures extends StatelessWidget {
                                       },
                                       decoration: InputDecoration(
                                         labelText: "Password",
-                                        prefixIcon: Icon(Icons.lock),
+                                        prefixIcon: const Icon(Icons.lock),
                                         suffixIcon: IconButton(
                                           icon: Icon(hidePassword
                                               ? Icons.visibility
                                               : Icons.visibility_off),
                                           onPressed: () {
-                                            print(passController.text);
                                             // cubit.changePassShowClicked();
                                           },
                                         ),
@@ -123,13 +124,13 @@ class SheetFeatures extends StatelessWidget {
                                               BorderRadius.circular(25.0),
                                         ),
                                       )),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
-                                  Container(
+                                  SizedBox(
                                     width: double.infinity,
                                     child: state is SendToEspLoading
-                                        ? Center(
+                                        ? const Center(
                                             child: CircularProgressIndicator())
                                         : ElevatedButton(
                                             onPressed: () {
@@ -141,12 +142,13 @@ class SheetFeatures extends StatelessWidget {
                                                     passController.text);
                                               }
                                             },
-                                            child: Text('Send Configuration',
+                                            child: const Text(
+                                                'Send Configuration',
                                                 style: TextStyle(
                                                     fontSize: 18.0,
                                                     color: Colors.white)),
                                             style: ElevatedButton.styleFrom(
-                                              padding: EdgeInsets.all(15),
+                                              padding: const EdgeInsets.all(15),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(

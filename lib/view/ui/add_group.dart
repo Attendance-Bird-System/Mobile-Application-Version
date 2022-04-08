@@ -35,6 +35,8 @@ class AddGroup extends StatelessWidget {
   List<String> renameRowsName = [];
   bool useSheetRowAsName = true;
 
+  AddGroup({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AdminCubit, AdminCubitStates>(
@@ -53,10 +55,10 @@ class AddGroup extends StatelessWidget {
               floatingActionButton: FloatingActionButton(
                 backgroundColor: ColorManager.darkGrey,
                 child: state is CreateSpreadSheetLoading
-                    ? CircularProgressIndicator(
+                    ? const CircularProgressIndicator(
                         color: Colors.white,
                       )
-                    : Icon(
+                    : const Icon(
                         Icons.check,
                         size: 40,
                         color: Colors.white,
@@ -68,7 +70,6 @@ class AddGroup extends StatelessWidget {
                       cubit
                           .createSpreadSheet(sheetNameController.text, context)
                           .then((value) {
-                        print(value);
                         cubit.addColumnNames(
                             value, sheetNameController.text, context);
                       });
@@ -89,10 +90,10 @@ class AddGroup extends StatelessWidget {
                           showDialog(
                               context: context,
                               builder: (context) {
-                                Future.delayed(Duration(seconds: 4), () {
+                                Future.delayed(const Duration(seconds: 4), () {
                                   Navigator.of(context).pop(true);
                                 });
-                                return AlertDialog(
+                                return const AlertDialog(
                                   title: Text("make sure you name all columns"),
                                   backgroundColor: Colors.red,
                                 );
@@ -106,7 +107,7 @@ class AddGroup extends StatelessWidget {
               bottomNavigationBar: CurvedNavigationBar(
                 backgroundColor: Colors.white,
                 color: Colors.orange,
-                items: [
+                items: const [
                   Icon(
                     Icons.create_new_folder_outlined,
                     size: 30,
@@ -126,254 +127,227 @@ class AddGroup extends StatelessWidget {
               ),
               appBar: AppBar(
                 foregroundColor: Colors.white,
-                title: Text('Add Group'),
+                title: const Text('Add Group'),
               ),
               body: Container(
                 child: addIndex == 0
                     ? Padding(
                         padding: const EdgeInsets.all(10.0),
-                        child: Container(
-                            child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Center(
-                                child: Text(
-                                  'Create new Sheet',
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Center(
+                              child: Text(
+                                'Create new Sheet',
+                                style: TextStyle(
+                                    fontSize: 30,
+                                    color: Colors.orange,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Form(
+                                key: formKey3,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextFormField(
+                                        controller: sheetNameController,
+                                        keyboardType: TextInputType.text,
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'Name cannot be empty';
+                                          } else {
+                                            return null;
+                                          }
+                                        },
+                                        decoration: InputDecoration(
+                                          labelText: "Group name",
+                                          prefixIcon: const Icon(
+                                              Icons.drive_file_rename_outline),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderSide: const BorderSide(
+                                                color: Colors.orange,
+                                                width: 2.0),
+                                            borderRadius:
+                                                BorderRadius.circular(15.0),
+                                          ),
+                                        )),
+                                  ],
+                                )),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text(
+                                'specify your needed columns',
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    color: ColorManager.darkGrey,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            CheckboxListTile(
+                                title: const Text(
+                                  "ID",
                                   style: TextStyle(
-                                      fontSize: 30,
-                                      color: Colors.orange,
+                                      color: Colors.black54,
                                       fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Form(
-                                  key: formKey3,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      TextFormField(
-                                          controller: sheetNameController,
-                                          keyboardType: TextInputType.text,
-                                          validator: (value) {
-                                            if (value!.isEmpty) {
-                                              return 'Name cannot be empty';
-                                            } else {
-                                              return null;
-                                            }
-                                          },
-                                          decoration: InputDecoration(
-                                            labelText: "Group name",
-                                            prefixIcon: Icon(Icons
-                                                .drive_file_rename_outline),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderSide: const BorderSide(
-                                                  color: Colors.orange,
-                                                  width: 2.0),
-                                              borderRadius:
-                                                  BorderRadius.circular(15.0),
-                                            ),
-                                          )),
-                                    ],
-                                  )),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                child: Text(
-                                  'specify your needed columns',
+                                value: true,
+                                onChanged: (newValue) {},
+                                controlAffinity: ListTileControlAffinity
+                                    .leading, //  <-- leading Checkbox
+                                contentPadding: const EdgeInsets.all(0.0)),
+                            CheckboxListTile(
+                                title: const Text(
+                                  "Name",
                                   style: TextStyle(
-                                      fontSize: 20,
-                                      color: ColorManager.darkGrey,
+                                      color: Colors.black54,
                                       fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              Container(
-                                child: CheckboxListTile(
-                                    title: Text(
-                                      "ID",
-                                      style: TextStyle(
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    value: true,
-                                    onChanged: (newValue) {},
-                                    controlAffinity: ListTileControlAffinity
-                                        .leading, //  <-- leading Checkbox
-                                    contentPadding: EdgeInsets.all(0.0)),
-                              ),
-                              Container(
-                                child: CheckboxListTile(
-                                    title: Text(
-                                      "Name",
-                                      style: TextStyle(
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    value: true,
-                                    onChanged: (newValue) {},
-                                    controlAffinity: ListTileControlAffinity
-                                        .leading, //  <-- leading Checkbox
-                                    contentPadding: EdgeInsets.all(0.0)),
-                              ),
-                              Container(
-                                child: CheckboxListTile(
-                                    title: Text(
-                                      "Gender",
-                                      style: TextStyle(
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    value: neededColumns[2],
-                                    onChanged: (newValue) {
-                                      neededColumns[2] = !neededColumns[2];
-                                      cubit.changeNeededColumns();
-                                    },
-                                    controlAffinity: ListTileControlAffinity
-                                        .leading, //  <-- leading Checkbox
-                                    contentPadding: EdgeInsets.all(0.0)),
-                              ),
-                              Container(
-                                child: CheckboxListTile(
-                                    title: Text(
-                                      "Department",
-                                      style: TextStyle(
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    value: neededColumns[3],
-                                    onChanged: (newValue) {
-                                      neededColumns[3] = !neededColumns[3];
-                                      cubit.changeNeededColumns();
-                                    },
-                                    controlAffinity: ListTileControlAffinity
-                                        .leading, //  <-- leading Checkbox
-                                    contentPadding: EdgeInsets.all(0.0)),
-                              ),
-                              Container(
-                                child: CheckboxListTile(
-                                    title: Text(
-                                      "Image URL",
-                                      style: TextStyle(
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    value: neededColumns[4],
-                                    onChanged: (newValue) {
-                                      neededColumns[4] = !neededColumns[4];
-                                      cubit.changeNeededColumns();
-                                    },
-                                    controlAffinity: ListTileControlAffinity
-                                        .leading, //  <-- leading Checkbox
-                                    contentPadding: EdgeInsets.all(0.0)),
-                              ),
-                              Container(
-                                child: CheckboxListTile(
-                                    title: Text(
-                                      "Phone number",
-                                      style: TextStyle(
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    value: neededColumns[5],
-                                    onChanged: (newValue) {
-                                      neededColumns[5] = !neededColumns[5];
-                                      cubit.changeNeededColumns();
-                                    },
-                                    controlAffinity: ListTileControlAffinity
-                                        .leading, //  <-- leading Checkbox
-                                    contentPadding: EdgeInsets.all(0.0)),
-                              ),
-                              Container(
-                                child: CheckboxListTile(
-                                    title: Text(
-                                      "Other phone number",
-                                      style: TextStyle(
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    value: neededColumns[6],
-                                    onChanged: (newValue) {
-                                      neededColumns[6] = !neededColumns[5];
-                                      cubit.changeNeededColumns();
-                                    },
-                                    controlAffinity: ListTileControlAffinity
-                                        .leading, //  <-- leading Checkbox
-                                    contentPadding: EdgeInsets.all(0.0)),
-                              ),
-                              Container(
-                                child: CheckboxListTile(
-                                    title: Text(
-                                      "Email",
-                                      style: TextStyle(
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    value: neededColumns[7],
-                                    onChanged: (newValue) {
-                                      neededColumns[7] = !neededColumns[7];
-                                      cubit.changeNeededColumns();
-                                    },
-                                    controlAffinity: ListTileControlAffinity
-                                        .leading, //  <-- leading Checkbox
-                                    contentPadding: EdgeInsets.all(0.0)),
-                              ),
-                              Container(
-                                child: CheckboxListTile(
-                                    title: Text(
-                                      "LinkedIn",
-                                      style: TextStyle(
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    value: neededColumns[8],
-                                    onChanged: (newValue) {
-                                      neededColumns[8] = !neededColumns[8];
-                                      cubit.changeNeededColumns();
-                                    },
-                                    controlAffinity: ListTileControlAffinity
-                                        .leading, //  <-- leading Checkbox
-                                    contentPadding: EdgeInsets.all(0.0)),
-                              ),
-                              Container(
-                                child: CheckboxListTile(
-                                    title: Text(
-                                      "facebook",
-                                      style: TextStyle(
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    value: neededColumns[9],
-                                    onChanged: (newValue) {
-                                      neededColumns[9] = !neededColumns[9];
-                                      cubit.changeNeededColumns();
-                                    },
-                                    controlAffinity: ListTileControlAffinity
-                                        .leading, //  <-- leading Checkbox
-                                    contentPadding: EdgeInsets.all(0.0)),
-                              ),
-                              Container(
-                                child: CheckboxListTile(
-                                    title: Text(
-                                      "address",
-                                      style: TextStyle(
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    value: neededColumns[10],
-                                    onChanged: (newValue) {
-                                      neededColumns[10] = !neededColumns[10];
-                                      cubit.changeNeededColumns();
-                                    },
-                                    controlAffinity: ListTileControlAffinity
-                                        .leading, //  <-- leading Checkbox
-                                    contentPadding: EdgeInsets.all(0.0)),
-                              ),
-                            ],
-                          ),
-                        )),
+                                value: true,
+                                onChanged: (newValue) {},
+                                controlAffinity: ListTileControlAffinity
+                                    .leading, //  <-- leading Checkbox
+                                contentPadding: const EdgeInsets.all(0.0)),
+                            CheckboxListTile(
+                                title: const Text(
+                                  "Gender",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                value: neededColumns[2],
+                                onChanged: (newValue) {
+                                  neededColumns[2] = !neededColumns[2];
+                                  cubit.changeNeededColumns();
+                                },
+                                controlAffinity: ListTileControlAffinity
+                                    .leading, //  <-- leading Checkbox
+                                contentPadding: const EdgeInsets.all(0.0)),
+                            CheckboxListTile(
+                                title: const Text(
+                                  "Department",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                value: neededColumns[3],
+                                onChanged: (newValue) {
+                                  neededColumns[3] = !neededColumns[3];
+                                  cubit.changeNeededColumns();
+                                },
+                                controlAffinity: ListTileControlAffinity
+                                    .leading, //  <-- leading Checkbox
+                                contentPadding: const EdgeInsets.all(0.0)),
+                            CheckboxListTile(
+                                title: const Text(
+                                  "Image URL",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                value: neededColumns[4],
+                                onChanged: (newValue) {
+                                  neededColumns[4] = !neededColumns[4];
+                                  cubit.changeNeededColumns();
+                                },
+                                controlAffinity: ListTileControlAffinity
+                                    .leading, //  <-- leading Checkbox
+                                contentPadding: const EdgeInsets.all(0.0)),
+                            CheckboxListTile(
+                                title: const Text(
+                                  "Phone number",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                value: neededColumns[5],
+                                onChanged: (newValue) {
+                                  neededColumns[5] = !neededColumns[5];
+                                  cubit.changeNeededColumns();
+                                },
+                                controlAffinity: ListTileControlAffinity
+                                    .leading, //  <-- leading Checkbox
+                                contentPadding: const EdgeInsets.all(0.0)),
+                            CheckboxListTile(
+                                title: const Text(
+                                  "Other phone number",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                value: neededColumns[6],
+                                onChanged: (newValue) {
+                                  neededColumns[6] = !neededColumns[5];
+                                  cubit.changeNeededColumns();
+                                },
+                                controlAffinity: ListTileControlAffinity
+                                    .leading, //  <-- leading Checkbox
+                                contentPadding: const EdgeInsets.all(0.0)),
+                            CheckboxListTile(
+                                title: const Text(
+                                  "Email",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                value: neededColumns[7],
+                                onChanged: (newValue) {
+                                  neededColumns[7] = !neededColumns[7];
+                                  cubit.changeNeededColumns();
+                                },
+                                controlAffinity: ListTileControlAffinity
+                                    .leading, //  <-- leading Checkbox
+                                contentPadding: const EdgeInsets.all(0.0)),
+                            CheckboxListTile(
+                                title: const Text(
+                                  "LinkedIn",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                value: neededColumns[8],
+                                onChanged: (newValue) {
+                                  neededColumns[8] = !neededColumns[8];
+                                  cubit.changeNeededColumns();
+                                },
+                                controlAffinity: ListTileControlAffinity
+                                    .leading, //  <-- leading Checkbox
+                                contentPadding: const EdgeInsets.all(0.0)),
+                            CheckboxListTile(
+                                title: const Text(
+                                  "facebook",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                value: neededColumns[9],
+                                onChanged: (newValue) {
+                                  neededColumns[9] = !neededColumns[9];
+                                  cubit.changeNeededColumns();
+                                },
+                                controlAffinity: ListTileControlAffinity
+                                    .leading, //  <-- leading Checkbox
+                                contentPadding: const EdgeInsets.all(0.0)),
+                            CheckboxListTile(
+                                title: const Text(
+                                  "address",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                value: neededColumns[10],
+                                onChanged: (newValue) {
+                                  neededColumns[10] = !neededColumns[10];
+                                  cubit.changeNeededColumns();
+                                },
+                                controlAffinity: ListTileControlAffinity
+                                    .leading, //  <-- leading Checkbox
+                                contentPadding: const EdgeInsets.all(0.0)),
+                          ],
+                        ),
                       )
                     : Padding(
                         padding: const EdgeInsets.all(15.0),
@@ -388,15 +362,15 @@ class AddGroup extends StatelessWidget {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
+                                        const Text(
                                           'If you already have sheet',
                                           style: TextStyle(
                                               fontSize: 25,
                                               color: Colors.orange,
                                               fontWeight: FontWeight.bold),
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
+                                        const Padding(
+                                          padding: EdgeInsets.symmetric(
                                               vertical: 8.0),
                                           child: Text(
                                             'make sure that the link is "Editor" & "For every one" \nThe ID column should named as <ID>\nThe name column should named as <Name>"',
@@ -418,7 +392,7 @@ class AddGroup extends StatelessWidget {
                                             },
                                             decoration: InputDecoration(
                                               labelText: "Group name",
-                                              prefixIcon: Icon(Icons
+                                              prefixIcon: const Icon(Icons
                                                   .drive_file_rename_outline),
                                               enabledBorder: OutlineInputBorder(
                                                 borderSide: const BorderSide(
@@ -428,7 +402,7 @@ class AddGroup extends StatelessWidget {
                                                     BorderRadius.circular(15.0),
                                               ),
                                             )),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 10,
                                         ),
                                         TextFormField(
@@ -444,7 +418,8 @@ class AddGroup extends StatelessWidget {
                                             decoration: InputDecoration(
                                               enabled: useSheetRowAsName,
                                               labelText: "Sheet Link",
-                                              prefixIcon: Icon(Icons.link),
+                                              prefixIcon:
+                                                  const Icon(Icons.link),
                                               enabledBorder: OutlineInputBorder(
                                                 borderSide: const BorderSide(
                                                     color: Colors.orange,
@@ -453,41 +428,35 @@ class AddGroup extends StatelessWidget {
                                                     BorderRadius.circular(15.0),
                                               ),
                                             )),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 10,
                                         ),
-                                        Container(
-                                          child: CheckboxListTile(
-                                              title: Text(
-                                                "Use the first Row as columns name",
-                                                style: TextStyle(
-                                                    color: Colors.black54,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              value: useSheetRowAsName,
-                                              onChanged: (newValue) {
-                                                if (formKey.currentState!
-                                                    .validate()) {
-                                                  cubit
-                                                      .useSheetRowAsNameCheckBox(
-                                                          context,
-                                                          useSheetRowAsName,
-                                                          sheetLinkController
-                                                              .text);
-                                                }
-                                              },
-                                              controlAffinity:
-                                                  ListTileControlAffinity
-                                                      .leading, //  <-- leading Checkbox
-                                              contentPadding:
-                                                  EdgeInsets.all(0.0)),
-                                        ),
+                                        CheckboxListTile(
+                                            title: const Text(
+                                              "Use the first Row as columns name",
+                                              style: TextStyle(
+                                                  color: Colors.black54,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            value: useSheetRowAsName,
+                                            onChanged: (newValue) {
+                                              if (formKey.currentState!
+                                                  .validate()) {
+                                                cubit.useSheetRowAsNameCheckBox(
+                                                    context,
+                                                    useSheetRowAsName,
+                                                    sheetLinkController.text);
+                                              }
+                                            },
+                                            controlAffinity: ListTileControlAffinity
+                                                .leading, //  <-- leading Checkbox
+                                            contentPadding:
+                                                const EdgeInsets.all(0.0)),
                                       ],
                                     )),
                                 Container(
                                     child: state is UseSheetRowAsNameLoading
-                                        ? Center(
+                                        ? const Center(
                                             child: CircularProgressIndicator())
                                         : useSheetRowAsName == true
                                             ? Container()
@@ -495,10 +464,10 @@ class AddGroup extends StatelessWidget {
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        vertical: 8.0),
+                                                  const Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 8.0),
                                                     child: Text(
                                                         'specify column name',
                                                         style: TextStyle(
@@ -526,38 +495,37 @@ class AddGroup extends StatelessWidget {
                                                             InputDecoration(
                                                           labelText:
                                                               "Column ${String.fromCharCode(currentColumnToFill)} name",
-                                                          prefixIcon: Icon(Icons
-                                                              .file_copy_outlined),
-                                                          suffixIcon:
-                                                              IconButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    if (formKey2
-                                                                        .currentState!
-                                                                        .validate()) {
-                                                                      cubit.addRowName(
-                                                                          columnNameController
-                                                                              .text,
-                                                                          currentColumnToFill,
-                                                                          context);
-                                                                    }
-                                                                    columnNameController
-                                                                        .text = "";
-                                                                  },
-                                                                  icon: Icon(
-                                                                    Icons
-                                                                        .next_plan_outlined,
-                                                                    size: 25,
-                                                                    color: Colors
-                                                                        .orange,
-                                                                  )),
+                                                          prefixIcon:
+                                                              const Icon(Icons
+                                                                  .file_copy_outlined),
+                                                          suffixIcon: IconButton(
+                                                              onPressed: () {
+                                                                if (formKey2
+                                                                    .currentState!
+                                                                    .validate()) {
+                                                                  cubit.addRowName(
+                                                                      columnNameController
+                                                                          .text,
+                                                                      currentColumnToFill,
+                                                                      context);
+                                                                }
+                                                                columnNameController
+                                                                    .text = "";
+                                                              },
+                                                              icon: const Icon(
+                                                                Icons
+                                                                    .next_plan_outlined,
+                                                                size: 25,
+                                                                color: Colors
+                                                                    .orange,
+                                                              )),
                                                           enabledBorder:
                                                               OutlineInputBorder(
-                                                            borderSide: BorderSide(
-                                                                color:
-                                                                    ColorManager
+                                                            borderSide:
+                                                                const BorderSide(
+                                                                    color: ColorManager
                                                                         .darkGrey,
-                                                                width: 2.0),
+                                                                    width: 2.0),
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(

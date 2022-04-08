@@ -31,7 +31,7 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(
                   height: 40,
                 ),
-                MainLoginWidget()
+                const MainLoginWidget()
               ],
             ),
           ),

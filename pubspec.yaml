@@ -20,19 +20,10 @@ version: 1.0.0+1
 environment:
   sdk: ">=2.15.0-116.0.dev <3.0.0"
 
-# Dependencies specify other packages that your package needs in order to work.
-# To automatically upgrade your package dependencies to the latest versions
-# consider running `flutter pub upgrade --major-versions`. Alternatively,
-# dependencies can be manually updated by changing the version numbers below to
-# the latest version available on pub.dev. To see which dependencies have newer
-# versions available, run `flutter pub outdated`.
 dependencies:
   flutter:
     sdk: flutter
 
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   #icons
   cupertino_icons: ^1.0.2
   font_awesome_flutter: ^10.1.0
@@ -53,12 +44,10 @@ dependencies:
   shared_preferences: ^2.0.13
   #widget
   curved_navigation_bar: ^1.0.1
-  flutter_typeahead: ^3.2.1
+  flutter_typeahead: ^3.2.4
   fluttertoast: ^8.0.8
   flutter_native_splash: ^1.2.4
   onboarding: ^3.1.0
-
-
 
 dev_dependencies:
   flutter_test:

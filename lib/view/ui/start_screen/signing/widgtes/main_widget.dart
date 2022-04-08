@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:auto_id/bloc/admin_bloc/admin_data_bloc.dart';
+
 import '../../../../../model/module/app_admin.dart';
 import 'package:auto_id/view/resources/color_manager.dart';
 import 'package:flutter/material.dart';
@@ -7,16 +9,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../../../bloc/auth_bloc/auth_status_bloc.dart';
-import '../../../../../bloc/admin_cubit.dart';
 import '../../../../shared/functions/navigation_functions.dart';
-import '../../../../ui/main_screen.dart';
+import '../../../main_view/main_screen.dart';
 import 'clip_pathes.dart';
 import 'forget_pass_dialog.dart';
 import 'form_field.dart';
 
 // ignore: must_be_immutable
 class MainLoginWidget extends StatefulWidget {
-  MainLoginWidget({Key? key}) : super(key: key);
+  const MainLoginWidget({Key? key}) : super(key: key);
 
   @override
   State<MainLoginWidget> createState() => _MainLoginWidgetState();
@@ -36,7 +37,10 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      padding: EdgeInsets.only(
+          right: 10.0,
+          left: 10.0,
+          bottom: MediaQuery.of(context).viewInsets.bottom),
       child: SizedBox(
         height: 500,
         width: MediaQuery.of(context).size.width * 0.95,
@@ -90,9 +94,11 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
           BlocListener<AuthStatusBloc, AuthStates>(
             listener: (context, state) {
               if (state.status == AuthStatus.successLogIn) {
-                navigateAndReplace(context, MainScreen());
+                navigateAndReplace(context, const MainScreen());
                 AppAdmin appAdmin = context.read<AuthStatusBloc>().user;
-                AdminCubit.get(context).getInitialData(appAdmin);
+                context
+                    .read<AdminDataBloc>()
+                    .add(StartDataOperations(appAdmin));
               } else if (state.status == AuthStatus.successSignUp) {
                 setState(() {
                   isLogin = true;
@@ -196,7 +202,7 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
                                   filter:
                                       ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                                   child: Dialog(
-                                    shape: RoundedRectangleBorder(
+                                    shape: const RoundedRectangleBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(20))),
                                     child: ForgetPassword(),
@@ -205,7 +211,7 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
                                 );
                               });
                         },
-                        child: Text(
+                        child: const Text(
                           "Forgot Password ?",
                           style: TextStyle(
                               fontWeight: FontWeight.w600,
@@ -221,7 +227,7 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
                 ),
                 usedButton(
                     state.status == AuthStatus.submittingEmail
-                        ? CircularProgressIndicator()
+                        ? const CircularProgressIndicator()
                         : const Text(
                             "Sign In",
                             style: TextStyle(
@@ -239,7 +245,7 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
                 ),
                 usedButton(
                     state.status == AuthStatus.submittingGoogle
-                        ? CircularProgressIndicator()
+                        ? const CircularProgressIndicator()
                         : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: const [
@@ -395,7 +401,7 @@ class _MainLoginWidgetState extends State<MainLoginWidget> {
                 ),
                 usedButton(
                     state.status == AuthStatus.submittingEmail
-                        ? CircularProgressIndicator()
+                        ? const CircularProgressIndicator()
                         : const Text(
                             "Sign Up",
                             style: TextStyle(

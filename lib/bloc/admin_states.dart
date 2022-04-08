@@ -4,7 +4,7 @@ enum AdminCubitStatus { initial, loading, loaded, error }
 
 abstract class AdminCubitStates extends Equatable {
   final AdminCubitStatus status;
-  AdminCubitStates({this.status = AdminCubitStatus.initial});
+  const AdminCubitStates({this.status = AdminCubitStatus.initial});
 
   @override
   List<Object?> get props => [status];

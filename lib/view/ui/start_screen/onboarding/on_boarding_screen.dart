@@ -9,6 +9,8 @@ import '../signing/login_screen.dart';
 class OnBoardingView extends StatelessWidget {
   int index = 0;
 
+  OnBoardingView({Key? key}) : super(key: key);
+
   Widget _signUpButton(bool isDone, BuildContext context) {
     return Material(
       borderRadius: defaultProceedButtonBorderRadius,
@@ -16,7 +18,7 @@ class OnBoardingView extends StatelessWidget {
       child: InkWell(
         borderRadius: defaultProceedButtonBorderRadius,
         onTap: () {
-          navigateAndPush(context, LoginView());
+          navigateAndPush(context, const LoginView());
         },
         child: Padding(
           padding: defaultProceedButtonPadding,
@@ -41,8 +43,8 @@ class OnBoardingView extends StatelessWidget {
                     controller: ScrollController(),
                     child: Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
+                        const Padding(
+                          padding: EdgeInsets.symmetric(
                             horizontal: 45.0,
                             vertical: 90.0,
                           ),
@@ -51,7 +53,7 @@ class OnBoardingView extends StatelessWidget {
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 45.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 45.0),
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
@@ -91,8 +93,8 @@ class OnBoardingView extends StatelessWidget {
                   netDragPercent: dragDistance,
                   pagesLength: pagesLength,
                   indicator: Indicator(
-                    activeIndicator: ActiveIndicator(borderWidth: 8),
-                    closedIndicator: ClosedIndicator(borderWidth: 5),
+                    activeIndicator: const ActiveIndicator(borderWidth: 8),
+                    closedIndicator: const ClosedIndicator(borderWidth: 5),
                     indicatorDesign: IndicatorDesign.line(
                       lineDesign: LineDesign(
                         lineType: DesignType.line_uniform,

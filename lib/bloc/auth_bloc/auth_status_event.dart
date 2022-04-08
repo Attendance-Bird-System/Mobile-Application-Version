@@ -17,7 +17,7 @@ class LoginInUsingEmailEvent extends AuthStatusEvent {
   final String email;
   final String password;
 
-  LoginInUsingEmailEvent(this.email, this.password);
+  const LoginInUsingEmailEvent(this.email, this.password);
 
   @override
   List<Object?> get props => [email, password];
@@ -27,7 +27,7 @@ class SignUpInUsingEmailEvent extends AuthStatusEvent {
   final String email;
   final String password;
 
-  SignUpInUsingEmailEvent(this.email, this.password);
+  const SignUpInUsingEmailEvent(this.email, this.password);
 
   @override
   List<Object?> get props => [email, password];
@@ -36,7 +36,7 @@ class SignUpInUsingEmailEvent extends AuthStatusEvent {
 class ForgetPasswordEvent extends AuthStatusEvent {
   final String email;
 
-  ForgetPasswordEvent(this.email);
+  const ForgetPasswordEvent(this.email);
 
   @override
   List<Object?> get props => [email];

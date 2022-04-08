@@ -1,5 +1,8 @@
+import 'package:auto_id/bloc/admin_bloc/admin_data_bloc.dart';
+
+import 'bloc/my_bloc_observer.dart';
 import 'model/module/app_admin.dart';
-import 'view/ui/main_screen.dart';
+import 'view/ui/main_view/main_screen.dart';
 import 'package:auto_id/view/resources/color_manager.dart';
 import 'package:auto_id/view/resources/string_manager.dart';
 import 'package:auto_id/view/ui/start_screen/onboarding/on_boarding_screen.dart';
@@ -14,46 +17,52 @@ import 'bloc/admin_cubit.dart';
 import 'model/local/pref_repository.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: ColorManager.mainOrange,
   ));
-  await Firebase.initializeApp();
-  await PreferenceRepository.initializePreference();
-  await FirebaseAuth.instance.signOut();
-  User? user = FirebaseAuth.instance.currentUser;
-  AppAdmin tempUser = AppAdmin.empty;
-  if (user != null) {
-    tempUser = AppAdmin.fromFirebaseUser(user);
-  }
-  print(tempUser.id);
-  runApp(MyApp(tempUser));
+
+  return BlocOverrides.runZoned(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      await Firebase.initializeApp();
+      await PreferenceRepository.initializePreference();
+      User? user = FirebaseAuth.instance.currentUser;
+      AppAdmin tempUser = AppAdmin.empty;
+      if (user != null) {
+        tempUser = AppAdmin.fromFirebaseUser(user);
+      }
+
+      runApp(MyApp(tempUser));
+    },
+    blocObserver: MyBlocObserver(),
+  );
 }
 
 // ignore: must_be_immutable
 class MyApp extends StatelessWidget {
   final AppAdmin user;
-  MyApp(this.user);
+  const MyApp(this.user, {Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => AuthStatusBloc()),
-        BlocProvider(create: (_) => AdminCubit()..getInitialData(user)),
+        BlocProvider(create: (_) => AdminCubit()),
+        BlocProvider(
+            create: (_) => AdminDataBloc()..add(StartDataOperations(user))),
       ],
       child: MaterialApp(
         title: StringManger.appName,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           indicatorColor: ColorManager.whiteColor,
-          progressIndicatorTheme: ProgressIndicatorThemeData(
+          progressIndicatorTheme: const ProgressIndicatorThemeData(
             circularTrackColor: ColorManager.whiteColor,
           ),
           primarySwatch: Colors.orange,
           primaryColor: ColorManager.mainOrange,
         ),
-        home: user.isEmpty ? OnBoardingView() : MainScreen(),
+        home: user.isEmpty ? OnBoardingView() : const MainScreen(),
       ),
     );
   }

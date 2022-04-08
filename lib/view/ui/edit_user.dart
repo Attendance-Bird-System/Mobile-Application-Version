@@ -17,9 +17,8 @@ class EditUserScreen extends StatelessWidget {
   bool dataHere;
   bool dataWritten = true;
 
-  EditUserScreen(this.id, this.groupIndex, this.dataHere);
-  // id
-  // Group name
+  EditUserScreen(this.id, this.groupIndex, this.dataHere, {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,20 +39,20 @@ class EditUserScreen extends StatelessWidget {
           child: Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
-              shape: RoundedRectangleBorder(
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(
                   bottom: Radius.circular(25),
                 ),
               ),
               foregroundColor: Colors.white,
-              title: Text("Edit User"),
+              title: const Text("Edit User"),
               bottom: PreferredSize(
                 preferredSize: const Size.fromHeight(15),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     'ID : $id',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: ColorManager.darkGrey,
@@ -64,12 +63,12 @@ class EditUserScreen extends StatelessWidget {
             ),
             floatingActionButton: FloatingActionButton(
                 child: state is SendToEditLoading
-                    ? Center(
+                    ? const Center(
                         child: CircularProgressIndicator(
                           color: Colors.white,
                         ),
                       )
-                    : Icon(
+                    : const Icon(
                         Icons.check,
                         size: 35,
                         color: Colors.white,
@@ -83,7 +82,7 @@ class EditUserScreen extends StatelessWidget {
                         .contains('/')) {
                       if (cubit.groups![groupIndex].columnNames![i] == 'Name') {
                         dataToSent[cubit.groups![groupIndex].columnNames![i]] =
-                            this.typeAheadController.text;
+                            typeAheadController.text;
                       } else if (cubit.groups![groupIndex].columnNames![i]
                               .trim() !=
                           'ID') {
@@ -116,7 +115,6 @@ class EditUserScreen extends StatelessWidget {
                       onSuggestionSelected: (suggestion) {
                         int userIndex = cubit.groups![groupIndex].studentNames!
                             .indexOf(suggestion.toString());
-                        print(userIndex);
                         dataHere = true;
                         typeAheadController.text = suggestion.toString();
                         cubit.getUserData(groupIndex, userIndex, context);
@@ -124,27 +122,27 @@ class EditUserScreen extends StatelessWidget {
                       itemBuilder: (context, suggestion) {
                         return ListTile(
                           title: Text(suggestion.toString()),
-                          leading: Icon(Icons.assignment_ind_outlined),
+                          leading: const Icon(Icons.assignment_ind_outlined),
                         );
                       },
                       textFieldConfiguration: TextFieldConfiguration(
                           controller: typeAheadController,
                           decoration: InputDecoration(
                             labelText: "Name",
-                            prefixIcon: Icon(Icons.person),
+                            prefixIcon: const Icon(Icons.person),
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                   color: ColorManager.darkGrey, width: 2.0),
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           )),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   state is GetGroupPersonLoading
-                      ? Center(child: CircularProgressIndicator())
+                      ? const Center(child: CircularProgressIndicator())
                       : Expanded(
                           child: ListView.separated(
                               itemCount: cubit.groups?[groupIndex].columnNames
@@ -154,7 +152,7 @@ class EditUserScreen extends StatelessWidget {
                                 return inputBuilder(index, cubit, state);
                               },
                               separatorBuilder: (context, index) {
-                                return SizedBox(
+                                return const SizedBox(
                                   height: 15,
                                 );
                               }),
@@ -184,7 +182,6 @@ class EditUserScreen extends StatelessWidget {
       return Container();
     }
 
-    print(cubit.showedUserData);
     if ((dataHere && dataWritten) || state is GetGroupPersonDone) {
       editUserController[index].text =
           cubit.showedUserData.values.toList()[index];
@@ -203,7 +200,7 @@ class EditUserScreen extends StatelessWidget {
         },
         decoration: InputDecoration(
           labelText: "${cubit.groups?[groupIndex].columnNames?[index]}",
-          prefixIcon: Icon(Icons.input),
+          prefixIcon: const Icon(Icons.input),
           enabledBorder: OutlineInputBorder(
             borderSide: const BorderSide(color: Colors.orange, width: 2.0),
             borderRadius: BorderRadius.circular(10.0),

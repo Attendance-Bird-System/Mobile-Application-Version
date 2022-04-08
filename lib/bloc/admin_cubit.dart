@@ -11,20 +11,22 @@ import 'package:http/http.dart' as http;
 
 import '../view/shared/functions/navigation_functions.dart';
 import '../view/shared/widgets/toast_helper.dart';
-import '../view/ui/User_screen.dart';
+import '../view/ui/user_screen.dart';
 import '../view/ui/add_group.dart';
 import '../view/ui/edit_user.dart';
 import '../view/ui/group_screen.dart';
-import '../view/ui/main_screen.dart';
+import '../view/ui/main_view/main_screen.dart';
 import 'admin_states.dart';
+
+//TODO : This file will be removed nor for copy only
 
 class AdminCubit extends Cubit<AdminCubitStates> {
   AdminCubit() : super(AppInitial());
   static AdminCubit get(context) => BlocProvider.of(context);
 
-  static AppAdmin appAdmin = AppAdmin.empty;
-  AdminDataRepository _adminDataRepository = AdminDataRepository();
-  CardStudent cardStudent = CardStudent(state: StudentState.loading);
+  AppAdmin appAdmin = AppAdmin.empty;
+  final AdminDataRepository _adminDataRepository = AdminDataRepository();
+  CardStudent cardStudent = CardStudent.empty;
   List<GroupDetails>? groups;
   Map<String, dynamic> showedUserData = {};
 
@@ -37,17 +39,13 @@ class AdminCubit extends Cubit<AdminCubitStates> {
   void deleteUser(int userIndex, int groupIndex, BuildContext context) {
     emit(DeletePersonLoading());
     var url = Uri.parse(
-        "https://script.google.com/macros/s/AKfycbxx3WO2ZZQ0jSInhHwsl6p3ZvnM4NAVP-ka0ecbqkZJRnOlj8G7qTyvZcZdknsQGvk/exec?" +
-            "fun=remove&group=$groupIndex&person_id=$userIndex&userName=${appAdmin.id}");
-    print(url);
+        "https://script.google.com/macros/s/AKfycbxx3WO2ZZQ0jSInhHwsl6p3ZvnM4NAVP-ka0ecbqkZJRnOlj8G7qTyvZcZdknsQGvk/exec?fun=remove&group=$groupIndex&person_id=$userIndex&userName=${appAdmin.id}");
     http.read(url).then((value) {
-      print(value);
       emit(DeletePersonDone());
-      navigateAndReplace(context, MainScreen());
+      navigateAndReplace(context, const MainScreen());
     }).catchError((onError) {
       showToast("Error at deleting");
       emit(DeletePersonError());
-      print(onError);
     });
   }
 
@@ -55,15 +53,12 @@ class AdminCubit extends Cubit<AdminCubitStates> {
       int groupIndex, String id, Map dataToSent, BuildContext context) {
     emit(SendToEditLoading());
     var url = Uri.parse(
-        "https://script.google.com/macros/s/AKfycbxx3WO2ZZQ0jSInhHwsl6p3ZvnM4NAVP-ka0ecbqkZJRnOlj8G7qTyvZcZdknsQGvk/exec?fun=edit" +
-            "&group=$groupIndex" +
-            "&user_data=$dataToSent" +
-            "&person_id=$id" +
-            "&userName=${appAdmin.id}");
-    print(url);
+        "https://script.google.com/macros/s/AKfycbxx3WO2ZZQ0jSInhHwsl6p3ZvnM4NAVP-ka0ecbqkZJRnOlj8G7qTyvZcZdknsQGvk/exec?fun=edit"
+        "&group=$groupIndex"
+        "&user_data=$dataToSent"
+        "&person_id=$id"
+        "&userName=${appAdmin.id}");
     http.read(url).then((value) {
-      print("returned Data");
-      print(value);
       if (cardStudent.state == StudentState.newStudent &&
           cardStudent.id == id) {
         cardStudent = cardStudent.copyWith(
@@ -72,9 +67,8 @@ class AdminCubit extends Cubit<AdminCubitStates> {
             state: StudentState.notRegistered);
         _adminDataRepository.updateCardState();
       }
-      navigateAndReplace(context, MainScreen());
+      navigateAndReplace(context, const MainScreen());
     }).catchError((err) {
-      print("error is $err");
       emit(SendToEditError());
     });
   }
@@ -83,10 +77,10 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     showedUserData = {};
     emit(GetGroupPersonLoading());
     var url = Uri.parse(
-        "https://script.google.com/macros/s/AKfycbzAWq8QxQDISfOGFEougyd4gK29jQr3SWRUbDBgAR4Q6E-rekQbHqkrouqkidbG5SY/exec?" +
-            "userName=${appAdmin.id}" +
-            "&group=$groupIndex" +
-            "&index=${userIndex + 1}");
+        "https://script.google.com/macros/s/AKfycbzAWq8QxQDISfOGFEougyd4gK29jQr3SWRUbDBgAR4Q6E-rekQbHqkrouqkidbG5SY/exec?"
+        "userName=${appAdmin.id}"
+        "&group=$groupIndex"
+        "&index=${userIndex + 1}");
     http.read(url).catchError((err) {
       emit(GetGroupPersonError());
     }).then((value) {
@@ -100,7 +94,6 @@ class AdminCubit extends Cubit<AdminCubitStates> {
       showedUserData['userImageUrl'] = "";
       for (var v in showedUserData.values) {
         if (v.contains('drive.google.com')) {
-          print(v);
           if (v.contains('id')) {
             showedUserData['userImageUrl'] = v.toString();
           } else {
@@ -108,9 +101,8 @@ class AdminCubit extends Cubit<AdminCubitStates> {
               showedUserData['userImageUrl'] =
                   "https://drive.google.com/uc?export=view&id=" +
                       v.split('/')[5];
-            } catch (err) {
-              print(err);
-            }
+              // ignore: empty_catches
+            } catch (err) {}
           }
         }
       }
@@ -123,9 +115,9 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     emit(GoToEditUserLoading());
     if (groups?[index].columnNames == null) {
       var url = Uri.parse(
-          "https://script.google.com/macros/s/AKfycbwCgPd0uvbcYCrn3D5v-4GsH_E9OhMUakXe2D3tY0phqN3nxivfWn3efJ4TE6ckqgXa/exec?" +
-              "userName=${appAdmin.id}" +
-              "&group=$index");
+          "https://script.google.com/macros/s/AKfycbwCgPd0uvbcYCrn3D5v-4GsH_E9OhMUakXe2D3tY0phqN3nxivfWn3efJ4TE6ckqgXa/exec?"
+          "userName=${appAdmin.id}"
+          "&group=$index");
       http.read(url).then((value) {
         if (!value.startsWith('<!DOCTYPE')) {
           var list = value.split("!");
@@ -137,7 +129,6 @@ class AdminCubit extends Cubit<AdminCubitStates> {
         emit(GoToEditUserDone());
       }).catchError((onError) {
         emit(GoToEditUserError());
-        print(onError);
       });
     } else {
       navigateAndPush(
@@ -150,12 +141,11 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     showedUserData = {};
     emit(GetGroupPersonLoading());
     var url = Uri.parse(
-        "https://script.google.com/macros/s/AKfycbzAWq8QxQDISfOGFEougyd4gK29jQr3SWRUbDBgAR4Q6E-rekQbHqkrouqkidbG5SY/exec?" +
-            "userName=${appAdmin.id}" +
-            "&group=$groupIndex" +
-            "&index=${userIndex + 1}");
+        "https://script.google.com/macros/s/AKfycbzAWq8QxQDISfOGFEougyd4gK29jQr3SWRUbDBgAR4Q6E-rekQbHqkrouqkidbG5SY/exec?"
+        "userName=${appAdmin.id}"
+        "&group=$groupIndex"
+        "&index=${userIndex + 1}");
     http.read(url).catchError((err) {
-      print(err);
       emit(GetGroupPersonError());
     }).then((value) {
       if (!value.startsWith('<!DOCTYPE')) {
@@ -173,11 +163,10 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     emit(GetGroupNamesLoading());
     if (groups?[index].columnNames == null) {
       var url = Uri.parse(
-          "https://script.google.com/macros/s/AKfycbwCgPd0uvbcYCrn3D5v-4GsH_E9OhMUakXe2D3tY0phqN3nxivfWn3efJ4TE6ckqgXa/exec?" +
-              "userName=${appAdmin.id}" +
-              "&group=$index");
+          "https://script.google.com/macros/s/AKfycbwCgPd0uvbcYCrn3D5v-4GsH_E9OhMUakXe2D3tY0phqN3nxivfWn3efJ4TE6ckqgXa/exec?"
+          "userName=${appAdmin.id}"
+          "&group=$index");
       http.read(url).catchError((err) {
-        print(err);
         emit(GetGroupNamesError());
       }).then((value) {
         if (!value.startsWith('<!DOCTYPE')) {
@@ -209,9 +198,7 @@ class AdminCubit extends Cubit<AdminCubitStates> {
         "https://script.google.com/macros/s/AKfycbyDVddZV5IbMoj93yxZKY7tPdcyxG7pqjq5wkNTOxPHAKUsLZdvZoWZsjfmCJbhhO6NHA/exec?id=" +
             id +
             "&list=$renameRowsName");
-    http.read(url).catchError((err) {
-      print(err);
-    }).then((value) {
+    http.read(url).catchError((err) {}).then((value) {
       if (value.trim() == '1') {
         createGroup(id, groupName, context);
       }
@@ -247,7 +234,6 @@ class AdminCubit extends Cubit<AdminCubitStates> {
         "https://script.google.com/macros/s/AKfycbzi7OBUEk5ZaBWeOjelTJMVMaJnK4zTU78UwB59qJW0GvJBnZ_daHmY_VPusN3xCZb0jw/exec?id=" +
             id);
     http.read(url).catchError((err) {
-      print(err);
       showToast("Error happened while reading the data please try again");
       emit(TestLinkError());
     }).then((value) {
@@ -275,7 +261,6 @@ class AdminCubit extends Cubit<AdminCubitStates> {
           "https://script.google.com/macros/s/AKfycbzi7OBUEk5ZaBWeOjelTJMVMaJnK4zTU78UwB59qJW0GvJBnZ_daHmY_VPusN3xCZb0jw/exec?id=" +
               id);
       http.read(url).catchError((err) {
-        print(err);
         useSheetRowAsName = !useSheetRowAsName;
         showToast("Error happened while reading the data please try again");
         emit(UseSheetRowAsNameError());
@@ -309,10 +294,9 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     wifiName = wifiName.replaceAll(" ", "%20");
     var url = Uri.parse(
         'http://192.168.4.1/data?user=${appAdmin.id}&wifi=$wifiName&pass=$wifiPassword');
-    print(url);
     http.read(url).then((value) {
       if (value.trim() != "Failed") {
-        navigateAndReplace(context, MainScreen());
+        navigateAndReplace(context, const MainScreen());
         emit(SendToEspDone());
       } else {
         showToast("Error happened ,make sure Your WIFI and pass is correct ");
@@ -321,7 +305,6 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     }).catchError((e) {
       showToast(
           "Error happened ,make sure you connect to ESP wifi and try again");
-      print(e);
       emit(SendToEspError());
     });
   }
@@ -359,7 +342,8 @@ class AdminCubit extends Cubit<AdminCubitStates> {
       tableNameColumns.add(
         DataColumn(
             label: Text(String.fromCharCode(i + 65),
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                style: const TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.bold))),
       );
       dCells1.add(DataCell(Text(row1[i])));
       dCells2.add(DataCell(Text(row2[i])));
@@ -377,23 +361,10 @@ class AdminCubit extends Cubit<AdminCubitStates> {
   }
 
   ///**********************************************/
-  Future<void> getFireData() async {
-    cardStudent = await _adminDataRepository.readAdminData();
-    _adminDataRepository.buildListener((student) {
-      cardStudent = student;
-    });
-  }
 
   Future<void> createGroup(String id, String name, BuildContext context) async {
     await _adminDataRepository.createGroup(GroupDetails(name: name, id: id));
-    navigateAndReplace(context, MainScreen());
-  }
-
-  void getInitialData(AppAdmin oldUser) async {
-    if (!oldUser.isEmpty) {
-      appAdmin = oldUser;
-      getFireData();
-    }
+    navigateAndReplace(context, const MainScreen());
   }
 
   Future<void> deleteGroup(int groupIndex, BuildContext context) async {
@@ -403,7 +374,7 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     groups?.removeAt(groupIndex);
   }
 
-  Future<void> getGroupNames() async {
-    groups = await _adminDataRepository.getGroupNames();
+  Future<void> signOut() async {
+    await _adminDataRepository.cancelListener();
   }
 }

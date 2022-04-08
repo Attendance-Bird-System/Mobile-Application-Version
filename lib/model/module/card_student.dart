@@ -1,4 +1,7 @@
-class CardStudent {
+import 'package:equatable/equatable.dart';
+
+// ignore: must_be_immutable
+class CardStudent extends Equatable {
   String? name;
   String? id;
   String? imgUrl;
@@ -12,23 +15,31 @@ class CardStudent {
       this.imgUrl,
       this.groupIndex});
 
+  static CardStudent empty = CardStudent(state: StudentState.empty);
+
   CardStudent.fromFireBase(dynamic rowData) {
-    // TODO : Change data from firebase
     name = rowData['name'].toString();
     id = rowData['lastID'].toString();
-    state = {
-      "Done": StudentState.registered,
-      "problem": StudentState.notRegistered,
-      "new": StudentState.newStudent,
-      "NULL": StudentState.empty
-    }[rowData['state'].toString()]!;
+    state = _mapState(rowData['state'].toString());
+    imgUrl = _cvtImgLink(rowData['imgUrl'].toString());
+    groupIndex = rowData['groupIndex'];
+  }
 
-    imgUrl = rowData['imgUrl'].toString();
-    if (imgUrl!.contains("drive.google.com")) {
-      imgUrl =
-          "https://drive.google.com/uc?export=view&id=" + imgUrl!.split('/')[5];
+  CardStudent edit(String key, dynamic value) {
+    switch (key) {
+      case "groupIndex":
+        return copyWith(groupIndex: value);
+      case "imgUrl":
+        return copyWith(imgUrl: _cvtImgLink(value));
+      case "state":
+        return copyWith(state: _mapState(value.toString()));
+      case "name":
+        return copyWith(name: value);
+      case "lastID":
+        return copyWith(id: value.toString());
+      default:
+        return this;
     }
-    groupIndex = int.parse(rowData['groupIndex']);
   }
 
   CardStudent copyWith(
@@ -45,7 +56,26 @@ class CardStudent {
       groupIndex: groupIndex ?? this.groupIndex,
     );
   }
+
+  StudentState _mapState(String text) {
+    return {
+      "Done": StudentState.registered,
+      "problem": StudentState.notRegistered,
+      "new": StudentState.newStudent,
+      "NULL": StudentState.empty
+    }[text]!;
+  }
+
+  String _cvtImgLink(String old) {
+    if (old.contains("drive.google.com")) {
+      return "https://drive.google.com/uc?export=view&id=" +
+          imgUrl!.split('/')[5];
+    }
+    return old;
+  }
+
+  @override
+  List<Object?> get props => [name, state, id, imgUrl, groupIndex];
 }
 
-enum StudentState { registered, notRegistered, newStudent, empty, loading }
-//                                                                     "new"
+enum StudentState { registered, notRegistered, newStudent, empty }

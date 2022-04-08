@@ -17,21 +17,21 @@ class ForgetPassword extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 220,
-      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             "Forget password",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 22,
                 color: ColorManager.mainOrange),
           ),
-          Text(
+          const Text(
             "Reset mail will be sent to you ",
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Form(
@@ -50,7 +50,7 @@ class ForgetPassword extends StatelessWidget {
               },
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           BlocConsumer<AuthStatusBloc, AuthStates>(
@@ -73,7 +73,7 @@ class ForgetPassword extends StatelessWidget {
                                 .add(ForgetPasswordEvent(emailController.text));
                           }
                         },
-                        child: Text(
+                        child: const Text(
                           "Send mail",
                           style: TextStyle(fontSize: 18),
                         )),
