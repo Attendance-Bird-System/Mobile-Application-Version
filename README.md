@@ -1,16 +1,9 @@
 # auto_id
 
-A new Flutter application.
+Project video https://youtu.be/eYGIuboT_io
 
-## Getting Started
+Project documentation : https://drive.google.com/file/d/1koEKWnzJhHmozhBivmcpzBRgL_LUAxot/view?usp=sharing
 
-This project is a starting point for a Flutter application.
+Project Description : Cloud Management Attendance System... You can easily register the attendance and the absence for your employees by butting this device it automatically register them in google sheet and you can see all the process with mobile application
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+System Features :- - User Authentication by phone number - Read ID Tags & Send it to Cloud - Handling People Attendance - Records attendance into Google Sheets - Search, Add, and Edit Person information - Easy to configuration with local WIFI -Connect multiple admins to the same sheet
