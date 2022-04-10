@@ -86,15 +86,9 @@ class WebServices {
 
   Future<bool> sendCredentialsToEsp(
       String wifiName, String wifiPassword) async {
-    wifiPassword = wifiPassword.replaceAll("#", "%23");
-    wifiPassword = wifiPassword.replaceAll("&", "%26");
-    wifiPassword = wifiPassword.replaceAll("\$", "%24");
-    wifiPassword = wifiPassword.replaceAll(" ", "%20");
+    wifiPassword = _prepareCredentials(wifiPassword);
+    wifiName = _prepareCredentials(wifiName);
 
-    wifiName = wifiName.replaceAll("#", "%23");
-    wifiName = wifiName.replaceAll("&", "%26");
-    wifiName = wifiName.replaceAll("\$", "%24");
-    wifiName = wifiName.replaceAll(" ", "%20");
     String url =
         'http://192.168.4.1/data?user=$_id&wifi=$wifiName&pass=$wifiPassword';
     try {
@@ -114,19 +108,33 @@ class WebServices {
       Response response = await _dio.get(url);
       return response.data;
     } on DioError catch (e) {
-      throw SheetErrors.fromCode(e);
+      throw DioErrors.fromCode(e);
     } catch (_) {
-      throw const SheetErrors();
+      throw const DioErrors();
     }
+  }
+
+  String _prepareCredentials(String old) {
+    Map<String, dynamic> changedData = {
+      "#": "%23",
+      "&": "%26",
+      "\$": "%24",
+      " ": "%20"
+    };
+    changedData.forEach((key, value) {
+      old = old.replaceAll(key, value);
+    });
+
+    return old;
   }
 }
 
-class SheetErrors implements Exception {
-  const SheetErrors([
+class DioErrors implements Exception {
+  const DioErrors([
     this.message = 'An unknown exception occurred.',
   ]);
 
-  factory SheetErrors.fromCode(DioError error) {
+  factory DioErrors.fromCode(DioError error) {
     String message;
     switch (error.type) {
       case DioErrorType.connectTimeout:
@@ -150,7 +158,7 @@ class SheetErrors implements Exception {
             : message = "Unknown error happened";
         break;
     }
-    return SheetErrors(message);
+    return DioErrors(message);
   }
 
   final String message;

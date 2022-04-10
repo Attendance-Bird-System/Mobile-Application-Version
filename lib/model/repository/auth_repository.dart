@@ -6,14 +6,14 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../module/app_admin.dart';
 
 class AuthRepository {
-  final FirebaseAuth auth;
+  final FirebaseAuth _auth;
   final GoogleSignIn _googleSignIn;
   AppAdmin currUser = AppAdmin.empty;
 
   AuthRepository({
     FirebaseAuth? auth,
     GoogleSignIn? googleSignIn,
-  })  : auth = auth ?? firebase_auth.FirebaseAuth.instance,
+  })  : _auth = auth ?? firebase_auth.FirebaseAuth.instance,
         _googleSignIn = googleSignIn ?? GoogleSignIn.standard();
 
   Future<void> signUpWithEmailAndPassword({
@@ -21,7 +21,7 @@ class AuthRepository {
     required String password,
   }) async {
     try {
-      User? user = (await auth.createUserWithEmailAndPassword(
+      User? user = (await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       ))
@@ -42,7 +42,7 @@ class AuthRepository {
     String password,
   ) async {
     try {
-      User? user = (await auth.signInWithEmailAndPassword(
+      User? user = (await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       ))
@@ -78,7 +78,7 @@ class AuthRepository {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      User? user = (await auth.signInWithCredential(credential)).user;
+      User? user = (await _auth.signInWithCredential(credential)).user;
       if (user != null) {
         currUser = AppAdmin.fromFirebaseUser(user);
       }
