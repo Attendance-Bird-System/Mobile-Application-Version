@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../bloc/admin_cubit.dart';
-import '../../../resources/color_manager.dart';
+import '../../../bloc/deprecated_cubit/admin_cubit.dart';
+import '../../resources/color_manager.dart';
 
+// TODO : replace with dropdown menu in add user screen
 class AddBottomSheet extends StatelessWidget {
   const AddBottomSheet({Key? key}) : super(key: key);
 
@@ -63,7 +64,8 @@ class AddBottomSheet extends StatelessWidget {
           child: Text("${context.read<AdminCubit>().groups?[index].name}",
               style: const TextStyle(color: Colors.orange, fontSize: 12)),
           style: ButtonStyle(
-              padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(4)),
+              padding: MaterialStateProperty.all<EdgeInsets>(
+                  const EdgeInsets.all(4)),
               foregroundColor: MaterialStateProperty.all<Color>(Colors.orange),
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                   RoundedRectangleBorder(

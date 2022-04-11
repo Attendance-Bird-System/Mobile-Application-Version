@@ -12,7 +12,6 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../shared/functions/navigation_functions.dart';
 import '../esp_config.dart';
 
-// ignore: must_be_immutable
 class MainScreen extends StatelessWidget {
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);

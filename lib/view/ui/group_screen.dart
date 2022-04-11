@@ -4,8 +4,8 @@ import '../../view/shared/functions/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../bloc/admin_cubit.dart';
-import '../../bloc/admin_states.dart';
+import '../../bloc/deprecated_cubit/admin_cubit.dart';
+import '../../bloc/deprecated_cubit/admin_states.dart';
 import '../../view/shared/widgets/toast_helper.dart';
 
 // ignore: must_be_immutable

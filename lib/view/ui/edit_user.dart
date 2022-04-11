@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
-import '../../bloc/admin_cubit.dart';
-import '../../bloc/admin_states.dart';
+import '../../bloc/deprecated_cubit/admin_cubit.dart';
+import '../../bloc/deprecated_cubit/admin_states.dart';
 
 // ignore: must_be_immutable
 class EditUserScreen extends StatelessWidget {

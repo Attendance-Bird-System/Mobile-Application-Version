@@ -3,8 +3,8 @@ import 'package:auto_id/view/resources/color_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../bloc/admin_cubit.dart';
-import '../../bloc/admin_states.dart';
+import '../../bloc/deprecated_cubit/admin_cubit.dart';
+import '../../bloc/deprecated_cubit/admin_states.dart';
 import 'edit_user.dart';
 
 // ignore: must_be_immutable

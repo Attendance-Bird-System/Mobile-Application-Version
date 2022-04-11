@@ -13,7 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'bloc/auth_bloc/auth_status_bloc.dart';
 
-import 'bloc/admin_cubit.dart';
+import 'bloc/deprecated_cubit/admin_cubit.dart';
 import 'model/local/pref_repository.dart';
 
 Future<void> main() async {

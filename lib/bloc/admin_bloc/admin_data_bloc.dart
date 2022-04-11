@@ -39,12 +39,11 @@ class AdminDataBloc extends Bloc<AdminDataEvent, AdminDataStates> {
         groupList: state.groupList));
   }
 
-  ///************************ need events **************************/
+  ///***************** need events and states **************************/
 
   Future<void> deleteUser(int userIndex, int groupIndex) async {
     try {
       await _webServices.deleteStudentFromSheet(userIndex, groupIndex);
-      // user deleted successfully
     } on DioErrors catch (err) {
       showToast(err.message, type: ToastType.error);
     }
@@ -71,7 +70,6 @@ class AdminDataBloc extends Bloc<AdminDataEvent, AdminDataStates> {
     try {
       Map<String, dynamic> showedUserData =
           await _webServices.getUserData(userIndex, groupIndex);
-      // get user successfully
     } on DioErrors catch (err) {
       showToast(err.message, type: ToastType.error);
     }

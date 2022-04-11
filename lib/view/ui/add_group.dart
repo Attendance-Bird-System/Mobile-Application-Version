@@ -3,8 +3,8 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../bloc/admin_cubit.dart';
-import '../../bloc/admin_states.dart';
+import '../../bloc/deprecated_cubit/admin_cubit.dart';
+import '../../bloc/deprecated_cubit/admin_states.dart';
 
 List<String> neededColumnsNames = const [
   "ID",

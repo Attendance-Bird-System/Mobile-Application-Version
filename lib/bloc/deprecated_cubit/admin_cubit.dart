@@ -1,21 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:auto_id/model/module/group_details.dart';
-import '../model/module/card_student.dart';
+import '../../model/module/card_student.dart';
 import 'package:auto_id/model/repository/realtime_firebase.dart';
 
-import '../model/module/app_admin.dart';
+import '../../model/module/app_admin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 
-import '../view/shared/functions/navigation_functions.dart';
-import '../view/shared/widgets/toast_helper.dart';
-import '../view/ui/user_screen.dart';
-import '../view/ui/add_group.dart';
-import '../view/ui/edit_user.dart';
-import '../view/ui/group_screen.dart';
-import '../view/ui/main_view/main_screen.dart';
+import '../../view/shared/functions/navigation_functions.dart';
+import '../../view/shared/widgets/toast_helper.dart';
+import '../../view/ui/user_screen.dart';
+import '../../view/ui/add_group.dart';
+import '../../view/ui/edit_user.dart';
+import '../../view/ui/group_screen.dart';
+import '../../view/ui/main_view/main_screen.dart';
 import 'admin_states.dart';
 
 //TODO : This file will be removed nor for copy only

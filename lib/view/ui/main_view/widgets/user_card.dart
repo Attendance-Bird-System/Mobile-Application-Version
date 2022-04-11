@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../resources/color_manager.dart';
-import 'add_bottom_sheet.dart';
+import '../add_user_sheet.dart';
 
 // ignore: must_be_immutable
 class UserCard extends StatelessWidget {
@@ -61,7 +61,7 @@ class UserCard extends StatelessWidget {
                     children: [
                       const Center(
                         child: Text(
-                          'User doesn\'t exist',
+                          'New id passed',
                           style: TextStyle(
                               color: Colors.red,
                               fontSize: 18,
@@ -87,23 +87,8 @@ class UserCard extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(15.0),
                         child: Center(
-                          child: TextButton(
-                              child: const Text("Add the user",
-                                  style: TextStyle(
-                                      color: Colors.green, fontSize: 15)),
-                              style: ButtonStyle(
-                                  padding: MaterialStateProperty.all<EdgeInsets>(
-                                      const EdgeInsets.all(15)),
-                                  foregroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          Colors.lightGreen),
-                                  shape: MaterialStateProperty.all<
-                                          RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(18.0),
-                                          side:
-                                              const BorderSide(color: Colors.green)))),
+                          child: OutlinedButton(
+                              child: const Text("Add the user"),
                               onPressed: () => showBottomSheet(context)),
                         ),
                       ),
@@ -145,8 +130,8 @@ class UserCard extends StatelessWidget {
                         height: 5,
                       ),
                       cardStudent.state == StudentState.notRegistered
-                          ? Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: const [
                                 Text(
                                   'not Registered ',
@@ -158,10 +143,11 @@ class UserCard extends StatelessWidget {
                                 Icon(
                                   Icons.error_outline,
                                   color: Colors.red,
+                                  size: 15,
                                 )
                               ],
                             )
-                          : Wrap(
+                          : Row(
                               children: const [
                                 Text(
                                   'Process completed',
@@ -173,6 +159,7 @@ class UserCard extends StatelessWidget {
                                 Icon(
                                   Icons.check,
                                   color: Colors.green,
+                                  size: 15,
                                 )
                               ],
                             ),
