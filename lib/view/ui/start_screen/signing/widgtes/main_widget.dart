@@ -13,7 +13,7 @@ import '../../../../shared/functions/navigation_functions.dart';
 import '../../../main_view/main_screen.dart';
 import 'clip_pathes.dart';
 import 'forget_pass_dialog.dart';
-import 'form_field.dart';
+import '../../../../shared/widgets/form_field.dart';
 
 // ignore: must_be_immutable
 class MainLoginWidget extends StatefulWidget {

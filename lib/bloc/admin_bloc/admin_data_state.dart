@@ -1,13 +1,15 @@
+// ignore_for_file: must_be_immutable
+
 part of "admin_data_bloc.dart";
 
 enum AdminDataStatus { initial, loading, loaded, error }
 
-abstract class AdminDataStates extends Equatable {
-  final AdminDataStatus status;
-  final CardStudent cardStudent;
-  final List<GroupDetails> groupList;
+class AdminDataStates extends Equatable {
+  late AdminDataStatus status;
+  late CardStudent cardStudent;
+  late List<GroupDetails> groupList;
 
-  const AdminDataStates(
+  AdminDataStates(
       {this.status = AdminDataStatus.initial,
       required this.cardStudent,
       required this.groupList});
@@ -17,11 +19,14 @@ abstract class AdminDataStates extends Equatable {
 }
 
 class GetInitialDataState extends AdminDataStates {
-  const GetInitialDataState(
+  GetInitialDataState(
       {AdminDataStatus status = AdminDataStatus.initial,
-      required CardStudent cardStudent,
+      CardStudent? cardStudent,
       List<GroupDetails> groupList = const []})
-      : super(status: status, cardStudent: cardStudent, groupList: groupList);
+      : super(
+            status: status,
+            cardStudent: cardStudent ?? CardStudent.empty,
+            groupList: groupList);
 
   factory GetInitialDataState.initial() {
     return GetInitialDataState(
@@ -38,6 +43,80 @@ class GetInitialDataState extends AdminDataStates {
   //     groupList: groupList ?? this.groupList,
   //   );
   // }
+
+  @override
+  List<Object?> get props => [status, cardStudent, groupList.length];
+}
+
+class LoadGroupDataState extends AdminDataStates {
+  int groupIndex;
+  bool loadingDelete;
+  LoadGroupDataState(
+      {required this.groupIndex,
+      this.loadingDelete = false,
+      AdminDataStatus status = AdminDataStatus.initial,
+      CardStudent? cardStudent,
+      List<GroupDetails> groupList = const []})
+      : super(
+            status: status,
+            cardStudent: cardStudent ?? CardStudent.empty,
+            groupList: groupList);
+
+  factory LoadGroupDataState.fromOldState(
+      AdminDataStates oldState, AdminDataStatus status, int index,
+      {bool loadingSate = false}) {
+    return LoadGroupDataState(
+        groupIndex: index,
+        loadingDelete: loadingSate,
+        cardStudent: oldState.cardStudent,
+        groupList: oldState.groupList,
+        status: status);
+  }
+
+  @override
+  List<Object?> get props =>
+      [status, cardStudent, groupList.length, loadingDelete];
+}
+
+class SignOutState extends AdminDataStates {
+  SignOutState(
+      {AdminDataStatus status = AdminDataStatus.initial,
+      CardStudent? cardStudent,
+      List<GroupDetails> groupList = const []})
+      : super(
+            status: status,
+            cardStudent: cardStudent ?? CardStudent.empty,
+            groupList: groupList);
+
+  factory SignOutState.fromOldState(
+      AdminDataStates oldState, AdminDataStatus status) {
+    return SignOutState(
+        cardStudent: oldState.cardStudent,
+        groupList: oldState.groupList,
+        status: status);
+  }
+
+  @override
+  List<Object?> get props => [status, cardStudent, groupList.length];
+}
+
+class SendEspDataState extends AdminDataStates {
+  SendEspDataState(
+      {AdminDataStatus status = AdminDataStatus.initial,
+      CardStudent? cardStudent,
+      List<GroupDetails> groupList = const []})
+      : super(
+            status: status,
+            cardStudent: cardStudent ?? CardStudent.empty,
+            groupList: groupList);
+
+  factory SendEspDataState.fromOldState(
+      AdminDataStates oldState, AdminDataStatus status) {
+    return SendEspDataState(
+        cardStudent: oldState.cardStudent,
+        groupList: oldState.groupList,
+        status: status);
+  }
 
   @override
   List<Object?> get props => [status, cardStudent, groupList.length];

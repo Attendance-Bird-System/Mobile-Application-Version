@@ -1,5 +1,7 @@
+import 'package:auto_id/bloc/admin_bloc/admin_data_bloc.dart';
 import 'package:auto_id/model/module/group_details.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../resources/color_manager.dart';
 
@@ -32,33 +34,33 @@ class GroupList extends StatelessWidget {
     }
   }
 
-  Widget groupItemBuilder(int index, BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: ColorManager.darkGrey,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: InkWell(
-          onTap: () {
-            // cubit.getGroupNamesData(index + 1, context);
-          },
-          child: Column(
-            children: [
-              Text(
-                groups[index].name,
-                style: const TextStyle(
-                    color: Colors.orange,
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold),
-              ),
-            ],
+  Widget groupItemBuilder(int index, BuildContext context) => Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: ColorManager.darkGrey,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: InkWell(
+            onTap: () {
+              context
+                  .read<AdminDataBloc>()
+                  .add(LoadGroupDataEvent(index, false));
+            },
+            child: Column(
+              children: [
+                Text(
+                  groups[index].name,
+                  style: const TextStyle(
+                      color: Colors.orange,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
   Widget emptyGroups() => Column(
         mainAxisAlignment: MainAxisAlignment.center,

@@ -17,6 +17,10 @@ class AdminDataBloc extends Bloc<AdminDataEvent, AdminDataStates> {
   AdminDataBloc() : super(GetInitialDataState.initial()) {
     on<StartDataOperations>(_startGettingDataHandler);
     on<CardDataChangedEvents>(_cardDataChangesHandler);
+    on<SendConfigurationEvent>(_sendEspConfigHandler);
+    on<SignOutEvent>(_signOutHandler);
+    on<LoadGroupDataEvent>(_getGroupDataHandler);
+    on<DeleteGroupIndex>(_deleteGroup);
   }
 
   static AppAdmin admin = AppAdmin.empty;
@@ -27,6 +31,8 @@ class AdminDataBloc extends Bloc<AdminDataEvent, AdminDataStates> {
   Future<void> _startGettingDataHandler(
       StartDataOperations event, Emitter emit) async {
     if (!event.currentUser.isEmpty) {
+      emit(GetInitialDataState(
+          status: AdminDataStatus.loading, cardStudent: CardStudent.empty));
       admin = event.currentUser;
       await _readInitialFireData(emit);
     }
@@ -37,6 +43,63 @@ class AdminDataBloc extends Bloc<AdminDataEvent, AdminDataStates> {
         status: AdminDataStatus.loaded,
         cardStudent: state.cardStudent.edit(event.key, event.value),
         groupList: state.groupList));
+  }
+
+  Future<void> _getGroupDataHandler(
+      LoadGroupDataEvent event, Emitter emit) async {
+    LoadGroupDataState.fromOldState(
+        state, AdminDataStatus.loading, event.groupIndex);
+    if (state.groupList[event.groupIndex].columnNames == null) {
+      try {
+        state.groupList[event.groupIndex] = await _webServices.getGroupData(
+            event.groupIndex, state.groupList[event.groupIndex]);
+        LoadGroupDataState.fromOldState(
+            state, AdminDataStatus.loaded, event.groupIndex);
+      } on DioErrors catch (err) {
+        showToast(err.message, type: ToastType.error);
+        LoadGroupDataState.fromOldState(
+            state, AdminDataStatus.error, event.groupIndex);
+      }
+    }
+  }
+
+  Future<void> _deleteGroup(DeleteGroupIndex event, Emitter emit) async {
+    LoadGroupDataState.fromOldState(state, state.status, event.groupIndex,
+        loadingSate: true);
+    await _adminDataRepository
+        .deleteGroup(state.groupList[event.groupIndex].name);
+    state.groupList.removeAt(event.groupIndex);
+    emit(GetInitialDataState(
+        status: AdminDataStatus.loaded,
+        cardStudent: state.cardStudent,
+        groupList: state.groupList));
+  }
+
+  Future<void> _sendEspConfigHandler(
+      SendConfigurationEvent event, Emitter emit) async {
+    emit(SendEspDataState.fromOldState(state, AdminDataStatus.loading));
+    try {
+      bool success =
+          await _webServices.sendCredentialsToEsp(event.name, event.pass);
+      if (success) {
+        showToast("Device connected successfully", type: ToastType.success);
+        emit(SendEspDataState.fromOldState(state, AdminDataStatus.loaded));
+      } else {
+        emit(SendEspDataState.fromOldState(state, AdminDataStatus.error));
+        showToast("Error happened ,make sure Your WIFI and pass is correct");
+      }
+    } on DioErrors catch (err) {
+      showToast(err.message, type: ToastType.error);
+      showToast("Make sure you connect to device wifi and try again",
+          type: ToastType.error);
+    }
+  }
+
+  Future<void> _signOutHandler(SignOutEvent event, Emitter emit) async {
+    emit(SignOutState.fromOldState(state, AdminDataStatus.loading));
+    await _adminDataRepository.cancelListener();
+    await AuthRepository.signOut();
+    emit(SignOutState(status: AdminDataStatus.loaded));
   }
 
   ///***************** need events and states **************************/
@@ -75,17 +138,6 @@ class AdminDataBloc extends Bloc<AdminDataEvent, AdminDataStates> {
     }
   }
 
-  Future<void> getGroupData(int groupIndex, {bool force = false}) async {
-    if (state.groupList[groupIndex].columnNames == null) {
-      try {
-        state.groupList[groupIndex] = await _webServices.getGroupData(
-            groupIndex, state.groupList[groupIndex]);
-      } on DioErrors catch (err) {
-        showToast(err.message, type: ToastType.error);
-      }
-    }
-  }
-
   Future<String?> createSpreadSheet(String groupName) async {
     try {
       return await _webServices.createSpreadSheet(groupName);
@@ -111,14 +163,13 @@ class AdminDataBloc extends Bloc<AdminDataEvent, AdminDataStates> {
     }
   }
 
-  Future<void> addSheetColumnNames(
-      String id, String groupName, List<String> columnNames) async {
+  Future<void> addSheetColumnNames(String id, String groupName,
+      List<String> columnNames, Emitter emit) async {
     try {
       bool success =
           await _webServices.addColumnNames(id, groupName, columnNames);
       if (success) {
-        await _createGroup(id, groupName);
-        // group created
+        await _createGroup(id, groupName, emit);
       } else {
         showToast("can't Create group,try again", type: ToastType.error);
       }
@@ -127,34 +178,18 @@ class AdminDataBloc extends Bloc<AdminDataEvent, AdminDataStates> {
     }
   }
 
-  Future<void> sendToEsp(String wifiName, String wifiPassword) async {
-    try {
-      bool success =
-          await _webServices.sendCredentialsToEsp(wifiName, wifiPassword);
-      if (success) {
-      } else {
-        showToast("Error happened ,make sure Your WIFI and pass is correct ");
-      }
-    } on DioErrors catch (err) {
-      showToast(err.message, type: ToastType.error);
-      showToast("Make sure you connect to device wifi and try again",
-          type: ToastType.error);
-    }
-  }
-
-  Future<void> signOut() async {
-    await _adminDataRepository.cancelListener();
-    await AuthRepository.signOut();
-  }
-
   ///************************ Helper functions **************************/
-  Future<void> _createGroup(String id, String name) async {
-    await _adminDataRepository.createGroup(GroupDetails(name: name, id: id));
+  Future<void> _createGroup(String id, String name, Emitter emit) async {
+    GroupDetails newGroup = GroupDetails(name: name, id: id);
+    await _adminDataRepository.createGroup(newGroup);
+    state.groupList.insert(0, newGroup);
+    emit(GetInitialDataState(
+        status: AdminDataStatus.loaded,
+        cardStudent: state.cardStudent,
+        groupList: state.groupList));
   }
 
   Future<void> _readInitialFireData(Emitter emit) async {
-    emit(GetInitialDataState(
-        status: AdminDataStatus.loading, cardStudent: CardStudent.empty));
     if (await _checkConnectivity()) {
       CardStudent cardStudent = await _adminDataRepository.readAdminData();
       List<GroupDetails> groups = await _adminDataRepository.getGroupNames();
@@ -167,8 +202,7 @@ class AdminDataBloc extends Bloc<AdminDataEvent, AdminDataStates> {
       });
     } else {
       showToast("Please Check your internet connection");
-      emit(GetInitialDataState(
-          status: AdminDataStatus.error, cardStudent: CardStudent.empty));
+      emit(GetInitialDataState(status: AdminDataStatus.error));
     }
   }
 

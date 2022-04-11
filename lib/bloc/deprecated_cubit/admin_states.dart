@@ -1,16 +1,5 @@
-import 'package:equatable/equatable.dart';
+abstract class AdminCubitStates {}
 
-enum AdminCubitStatus { initial, loading, loaded, error }
-
-abstract class AdminCubitStates extends Equatable {
-  final AdminCubitStatus status;
-  const AdminCubitStates({this.status = AdminCubitStatus.initial});
-
-  @override
-  List<Object?> get props => [status];
-}
-
-//TODO : CHANGE STATES
 class AppInitial extends AdminCubitStates {}
 
 class CheckUserStateLoading extends AdminCubitStates {}
@@ -26,12 +15,6 @@ class UseSheetRowAsNameDone extends AdminCubitStates {}
 class ColumnPlusOne extends AdminCubitStates {}
 
 class ChangeNeededColumnsState extends AdminCubitStates {}
-
-class GetGroupDataLoading extends AdminCubitStates {}
-
-class GetGroupNamesLoading extends AdminCubitStates {}
-
-class GetGroupNamesError extends AdminCubitStates {}
 
 class GetGroupNamesDone extends AdminCubitStates {}
 
@@ -55,21 +38,9 @@ class TestLinkDone extends AdminCubitStates {}
 
 class CreateSpreadSheetLoading extends AdminCubitStates {}
 
-class SendToEspLoading extends AdminCubitStates {}
-
-class SendToEspError extends AdminCubitStates {}
-
-class GetGroupLinkLoading extends AdminCubitStates {}
-
-class FireDataGetting extends AdminCubitStates {}
-
-class SendToEspDone extends AdminCubitStates {}
-
 class SendToEditLoading extends AdminCubitStates {}
 
 class SendToEditError extends AdminCubitStates {}
-
-class SendToEditDone extends AdminCubitStates {}
 
 class AddGroupState extends AdminCubitStates {}
 
@@ -78,5 +49,3 @@ class DeletePersonLoading extends AdminCubitStates {}
 class DeletePersonError extends AdminCubitStates {}
 
 class DeletePersonDone extends AdminCubitStates {}
-
-class DeleteGroupLoading extends AdminCubitStates {}

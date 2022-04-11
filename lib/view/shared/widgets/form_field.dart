@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class DefaultFormField extends StatelessWidget {
   DefaultFormField(
       {required this.controller,
-      required this.fillHint,
+      this.fillHint,
       required this.title,
       required this.prefix,
       this.isPass = false,
@@ -16,7 +16,7 @@ class DefaultFormField extends StatelessWidget {
       : super(key: key);
 
   TextEditingController controller;
-  String fillHint;
+  String? fillHint;
   String title;
   IconData prefix;
   bool isPass = false;
@@ -28,7 +28,7 @@ class DefaultFormField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       obscureText: isPass,
-      autofillHints: [fillHint],
+      autofillHints: fillHint == null ? null : [fillHint!],
       keyboardType: keyboardType,
       validator: validator,
       decoration: InputDecoration(

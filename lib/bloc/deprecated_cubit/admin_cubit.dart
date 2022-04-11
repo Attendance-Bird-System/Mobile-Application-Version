@@ -14,7 +14,6 @@ import '../../view/shared/widgets/toast_helper.dart';
 import '../../view/ui/user_screen.dart';
 import '../../view/ui/add_group.dart';
 import '../../view/ui/edit_user.dart';
-import '../../view/ui/group_screen.dart';
 import '../../view/ui/main_view/main_screen.dart';
 import 'admin_states.dart';
 
@@ -164,31 +163,6 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     }
   }
 
-  /// done getGroupData
-  void getGroupNamesData(int index, BuildContext context) {
-    emit(GetGroupNamesLoading());
-    if (groups?[index].columnNames == null) {
-      var url = Uri.parse(
-          "https://script.google.com/macros/s/AKfycbwCgPd0uvbcYCrn3D5v-4GsH_E9OhMUakXe2D3tY0phqN3nxivfWn3efJ4TE6ckqgXa/exec?"
-          "userName=${appAdmin.id}"
-          "&group=$index");
-      http.read(url).catchError((err) {
-        emit(GetGroupNamesError());
-      }).then((value) {
-        if (!value.startsWith('<!DOCTYPE')) {
-          var list = value.split("!");
-          groups![index].studentNames = list[0].split(',');
-          groups![index].columnNames = list[1].split(',');
-        }
-        navigateAndPush(context, GroupScreen(index));
-        emit(GetGroupNamesDone());
-      });
-    } else {
-      navigateAndPush(context, GroupScreen(index));
-      emit(GetGroupNamesDone());
-    }
-  }
-
   /// done addColumnNames
   void addColumnNames(String id, String groupName, BuildContext context) {
     // run the script to make a column with the id
@@ -291,35 +265,6 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     }
   }
 
-  /// done sendCredentialsToEsp
-  void sendToEsp(BuildContext context, String wifiName, String wifiPassword) {
-    emit(SendToEspLoading());
-    wifiPassword = wifiPassword.replaceAll("#", "%23");
-    wifiPassword = wifiPassword.replaceAll("&", "%26");
-    wifiPassword = wifiPassword.replaceAll("\$", "%24");
-    wifiPassword = wifiPassword.replaceAll(" ", "%20");
-
-    wifiName = wifiName.replaceAll("#", "%23");
-    wifiName = wifiName.replaceAll("&", "%26");
-    wifiName = wifiName.replaceAll("\$", "%24");
-    wifiName = wifiName.replaceAll(" ", "%20");
-    var url = Uri.parse(
-        'http://192.168.4.1/data?user=${appAdmin.id}&wifi=$wifiName&pass=$wifiPassword');
-    http.read(url).then((value) {
-      if (value.trim() != "Failed") {
-        navigateAndReplace(context, MainScreen());
-        emit(SendToEspDone());
-      } else {
-        showToast("Error happened ,make sure Your WIFI and pass is correct ");
-        emit(SendToEspError());
-      }
-    }).catchError((e) {
-      showToast(
-          "Error happened ,make sure you connect to ESP wifi and try again");
-      emit(SendToEspError());
-    });
-  }
-
   void addGroup(BuildContext context) {
     tableNameColumns = [];
     tableNameRows = [];
@@ -376,16 +321,5 @@ class AdminCubit extends Cubit<AdminCubitStates> {
   Future<void> createGroup(String id, String name, BuildContext context) async {
     await _adminDataRepository.createGroup(GroupDetails(name: name, id: id));
     navigateAndReplace(context, MainScreen());
-  }
-
-  Future<void> deleteGroup(int groupIndex, BuildContext context) async {
-    emit(DeleteGroupLoading());
-    Navigator.of(context).pop();
-    await _adminDataRepository.deleteGroup(groups![groupIndex].name);
-    groups?.removeAt(groupIndex);
-  }
-
-  Future<void> signOut() async {
-    await _adminDataRepository.cancelListener();
   }
 }

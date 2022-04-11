@@ -10,7 +10,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../shared/functions/navigation_functions.dart';
-import '../esp_config.dart';
+import '../device_config/esp_config.dart';
+import '../group_screen/group_screen.dart';
 
 class MainScreen extends StatelessWidget {
   final RefreshController _refreshController =
@@ -35,14 +36,25 @@ class MainScreen extends StatelessWidget {
           IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () {
-                navigateAndPush(context, SheetFeatures());
+                navigateAndPush(context, const SendConfigScreen());
               }),
-          IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () {
-                // cubit.userLogOut(context);
-                navigateAndReplace(context, const LoginView());
-              }),
+          BlocConsumer<AdminDataBloc, AdminDataStates>(
+              buildWhen: (prev, next) => next is SignOutState,
+              listenWhen: (prev, next) => next is SignOutState,
+              builder: (context, state) => IconButton(
+                  icon: (state.status == AdminDataStatus.loaded) &&
+                          (state is SignOutState)
+                      ? const CircularProgressIndicator()
+                      : const Icon(Icons.logout),
+                  onPressed: () {
+                    context.read<AdminDataBloc>().add(SignOutEvent());
+                  }),
+              listener: (context, state) {
+                if ((state.status == AdminDataStatus.loading) &&
+                    (state is SignOutState)) {
+                  navigateAndReplace(context, const LoginView());
+                }
+              })
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -68,26 +80,34 @@ class MainScreen extends StatelessWidget {
               padding: const EdgeInsets.all(10.0),
               child: BlocConsumer<AdminDataBloc, AdminDataStates>(
                   buildWhen: (prev, next) => next is GetInitialDataState,
-                  listenWhen: (prev, next) => next is GetInitialDataState,
-                  listener: (_, state) {
+                  listener: (context, state) {
                     if (state.status != AdminDataStatus.loading &&
-                        _refreshController.isLoading) {
+                        _refreshController.isLoading &&
+                        state is GetInitialDataState) {
                       _refreshController.refreshCompleted();
+                    } else if (state is LoadGroupDataState &&
+                        state.status == AdminDataStatus.loading) {
+                      navigateAndPush(context, GroupScreen(state.groupIndex));
                     }
                   },
                   builder: (_, state) {
-                    if (state.status == AdminDataStatus.error) {
+                    bool myState = state is GetInitialDataState;
+                    if (myState && (state.status == AdminDataStatus.error)) {
                       return emptyGroups();
                     } else {
                       return Column(
                         children: [
-                          UserCard((state).cardStudent,
-                              state.status == AdminDataStatus.loading),
+                          UserCard(
+                              (state).cardStudent,
+                              myState &&
+                                  (state.status == AdminDataStatus.loading)),
                           const SizedBox(
                             height: 20,
                           ),
-                          GroupList(state.groupList,
-                              state.status == AdminDataStatus.loading),
+                          GroupList(
+                              state.groupList,
+                              myState &&
+                                  (state.status == AdminDataStatus.loading)),
                         ],
                       );
                     }
