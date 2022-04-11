@@ -16,7 +16,6 @@ class AuthStatusBloc extends Bloc<AuthStatusEvent, AuthStates> {
   AppAdmin get user => _authRepository.currUser;
 
   AuthStatusBloc() : super(AuthStates.initial()) {
-    on<AuthLogoutEvent>(_authLogOutHandler);
     on<LoginInUsingGoogleEvent>(_loginUsingGoogleHandler);
     on<SignUpInUsingEmailEvent>(_signUpUsingEmailHandler);
     on<ChangeSomeUiEvent>(_changeUiHandler);
@@ -117,12 +116,5 @@ class AuthStatusBloc extends Bloc<AuthStatusEvent, AuthStates> {
     } catch (_) {
       emit(state.copyWith(status: AuthStatus.error));
     }
-  }
-
-  void _authLogOutHandler(
-    AuthLogoutEvent event,
-    Emitter<AuthStates> emit,
-  ) {
-    _authRepository.signOut();
   }
 }

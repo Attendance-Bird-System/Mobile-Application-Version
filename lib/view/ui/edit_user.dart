@@ -117,7 +117,7 @@ class EditUserScreen extends StatelessWidget {
                             .indexOf(suggestion.toString());
                         dataHere = true;
                         typeAheadController.text = suggestion.toString();
-                        cubit.getUserData(groupIndex, userIndex, context);
+                        cubit.getUserData(groupIndex, userIndex);
                       },
                       itemBuilder: (context, suggestion) {
                         return ListTile(

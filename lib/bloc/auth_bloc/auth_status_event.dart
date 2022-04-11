@@ -7,8 +7,6 @@ abstract class AuthStatusEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class AuthLogoutEvent extends AuthStatusEvent {}
-
 class LoginInUsingGoogleEvent extends AuthStatusEvent {}
 
 class ChangeSomeUiEvent extends AuthStatusEvent {}

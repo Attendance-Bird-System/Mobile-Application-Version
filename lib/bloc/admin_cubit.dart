@@ -115,7 +115,7 @@ class AdminCubit extends Cubit<AdminCubitStates> {
   }
 
   /// done getUserData
-  void getUserData(int groupIndex, int userIndex, BuildContext context) {
+  void getUserData(int groupIndex, int userIndex) {
     showedUserData = {};
     emit(GetGroupPersonLoading());
     var url = Uri.parse(
