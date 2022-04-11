@@ -188,82 +188,73 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     return http.read(url);
   }
 
-  void addRowName(String value, int currentColumnToFill, BuildContext context) {
-    if (currentColumnToFill - 64 <= tableNumberOfUnnamedColumns) {
-      renameRowsName.add(value.replaceAll(" ", "-"));
-      currentColumnToFill++;
-      emit(ColumnPlusOne());
-    } else {
-      showToast("You name all column click the create button",
-          type: ToastType.info);
-    }
-  }
+  // void addRowName(String value, int currentColumnToFill, BuildContext context) {
+  //   if (currentColumnToFill - 64 <= tableNumberOfUnnamedColumns) {
+  //     renameRowsName.add(value.replaceAll(" ", "-"));
+  //     currentColumnToFill++;
+  //     emit(ColumnPlusOne());
+  //   } else {
+  //     showToast("You name all column click the create button",
+  //         type: ToastType.info);
+  //   }
+  // }
+
+  // /// done testSheetLink
+  // void testLink(BuildContext context, String groupName, String link) {
+  //   emit(TestLinkLoading());
+  //   emit(CreateSpreadSheetLoading());
+  //   String id = link.split('/')[5];
+  //   var url = Uri.parse(
+  //       "https://script.google.com/macros/s/AKfycbzi7OBUEk5ZaBWeOjelTJMVMaJnK4zTU78UwB59qJW0GvJBnZ_daHmY_VPusN3xCZb0jw/exec?id=" +
+  //           id);
+  //   http.read(url).catchError((err) {
+  //     showToast("Error happened while reading the data please try again");
+  //     emit(TestLinkError());
+  //   }).then((value) {
+  //     if (value.trim() == '-1') {
+  //       showToast(
+  //         "Invalid sheet please make sure that the url is public and editor",
+  //       );
+  //       emit(TestLinkError());
+  //     } else {
+  //       // Link Is Ok
+  //       createGroup(id, groupName, context);
+  //       emit(TestLinkDone());
+  //     }
+  //   });
+  // }
 
   /// done testSheetLink
-  void testLink(BuildContext context, String groupName, String link) {
-    emit(TestLinkLoading());
-    emit(CreateSpreadSheetLoading());
-    String id = link.split('/')[5];
-    var url = Uri.parse(
-        "https://script.google.com/macros/s/AKfycbzi7OBUEk5ZaBWeOjelTJMVMaJnK4zTU78UwB59qJW0GvJBnZ_daHmY_VPusN3xCZb0jw/exec?id=" +
-            id);
-    http.read(url).catchError((err) {
-      showToast("Error happened while reading the data please try again");
-      emit(TestLinkError());
-    }).then((value) {
-      if (value.trim() == '-1') {
-        showToast(
-          "Invalid sheet please make sure that the url is public and editor",
-        );
-        emit(TestLinkError());
-      } else {
-        // Link Is Ok
-        createGroup(id, groupName, context);
-        emit(TestLinkDone());
-      }
-    });
-  }
-
-  /// done testSheetLink
-  void useSheetRowAsNameCheckBox(
-      BuildContext context, bool useSheetRowAsName, String link) {
-    emit(UseSheetRowAsNameLoading());
-    renameRowsName = [];
-    if (useSheetRowAsName) {
-      useSheetRowAsName = !useSheetRowAsName;
-      String id = link.split('/')[5];
-      var url = Uri.parse(
-          "https://script.google.com/macros/s/AKfycbzi7OBUEk5ZaBWeOjelTJMVMaJnK4zTU78UwB59qJW0GvJBnZ_daHmY_VPusN3xCZb0jw/exec?id=" +
-              id);
-      http.read(url).catchError((err) {
-        useSheetRowAsName = !useSheetRowAsName;
-        showToast("Error happened while reading the data please try again");
-        emit(UseSheetRowAsNameError());
-      }).then((value) {
-        if (value.trim() == '-1') {
-          useSheetRowAsName = !useSheetRowAsName;
-          showToast(
-              "Invalid sheet please make sure that the url is public and editor");
-          emit(UseSheetRowAsNameError());
-        } else {
-          createTable(value);
-          emit(UseSheetRowAsNameDone());
-        }
-      });
-    } else {
-      useSheetRowAsName = !useSheetRowAsName;
-      emit(UseSheetRowAsNameDone());
-    }
-  }
-
-  void getNamesFromBoolean(List<bool> neededColumns) {
-    renameRowsName = [];
-    for (int i = 0; i < 11; i++) {
-      if (neededColumns[i]) {
-        renameRowsName.add(neededColumnsNames[i]);
-      }
-    }
-  }
+  // void useSheetRowAsNameCheckBox(
+  //     BuildContext context, bool useSheetRowAsName, String link) {
+  //   emit(UseSheetRowAsNameLoading());
+  //   renameRowsName = [];
+  //   if (useSheetRowAsName) {
+  //     useSheetRowAsName = !useSheetRowAsName;
+  //     String id = link.split('/')[5];
+  //     var url = Uri.parse(
+  //         "https://script.google.com/macros/s/AKfycbzi7OBUEk5ZaBWeOjelTJMVMaJnK4zTU78UwB59qJW0GvJBnZ_daHmY_VPusN3xCZb0jw/exec?id=" +
+  //             id);
+  //     http.read(url).catchError((err) {
+  //       useSheetRowAsName = !useSheetRowAsName;
+  //       showToast("Error happened while reading the data please try again");
+  //       emit(UseSheetRowAsNameError());
+  //     }).then((value) {
+  //       if (value.trim() == '-1') {
+  //         useSheetRowAsName = !useSheetRowAsName;
+  //         showToast(
+  //             "Invalid sheet please make sure that the url is public and editor");
+  //         emit(UseSheetRowAsNameError());
+  //       } else {
+  //         createTable(value);
+  //         emit(UseSheetRowAsNameDone());
+  //       }
+  //     });
+  //   } else {
+  //     useSheetRowAsName = !useSheetRowAsName;
+  //     emit(UseSheetRowAsNameDone());
+  //   }
+  // }
 
   void addGroup(BuildContext context) {
     tableNameColumns = [];
@@ -274,48 +265,39 @@ class AdminCubit extends Cubit<AdminCubitStates> {
     emit(AddGroupState());
   }
 
-  void createTable(String value) {
-    tableNameColumns = [];
-    tableNameRows = [];
-    tableNumberOfUnnamedColumns =
-        int.parse(value.split('}{')[0].split('->')[1]);
-    List<String> row1 = value
-        .split('}{')[1]
-        .split("->")[1]
-        .split('][')[0]
-        .replaceAll(' [[', '')
-        .split(',');
-    List<String> row2 = value
-        .split('}{')[1]
-        .split("->")[1]
-        .split('][')[1]
-        .replaceAll(']]}', '')
-        .split(',');
-    List<DataCell> dCells1 = [];
-    List<DataCell> dCells2 = [];
-
-    for (var i = 0; i < tableNumberOfUnnamedColumns; i++) {
-      tableNameColumns.add(
-        DataColumn(
-            label: Text(String.fromCharCode(i + 65),
-                style: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold))),
-      );
-      dCells1.add(DataCell(Text(row1[i])));
-      dCells2.add(DataCell(Text(row2[i])));
-    }
-    tableNameRows = [DataRow(cells: dCells1), DataRow(cells: dCells2)];
-  }
-
-  void changeNeededColumns() {
-    emit(ChangeNeededColumnsState());
-  }
-
-  void changeAddTab() {
-    renameRowsName = [];
-    emit(ChangeAddTabState());
-  }
-
+  // void createTable(String value) {
+  //   tableNameColumns = [];
+  //   tableNameRows = [];
+  //   tableNumberOfUnnamedColumns =
+  //       int.parse(value.split('}{')[0].split('->')[1]);
+  //   List<String> row1 = value
+  //       .split('}{')[1]
+  //       .split("->")[1]
+  //       .split('][')[0]
+  //       .replaceAll(' [[', '')
+  //       .split(',');
+  //   List<String> row2 = value
+  //       .split('}{')[1]
+  //       .split("->")[1]
+  //       .split('][')[1]
+  //       .replaceAll(']]}', '')
+  //       .split(',');
+  //   List<DataCell> dCells1 = [];
+  //   List<DataCell> dCells2 = [];
+  //
+  //   for (var i = 0; i < tableNumberOfUnnamedColumns; i++) {
+  //     tableNameColumns.add(
+  //       DataColumn(
+  //           label: Text(String.fromCharCode(i + 65),
+  //               style: const TextStyle(
+  //                   fontSize: 18, fontWeight: FontWeight.bold))),
+  //     );
+  //     dCells1.add(DataCell(Text(row1[i])));
+  //     dCells2.add(DataCell(Text(row2[i])));
+  //   }
+  //   tableNameRows = [DataRow(cells: dCells1), DataRow(cells: dCells2)];
+  // }
+  //
   ///**********************************************/
 
   Future<void> createGroup(String id, String name, BuildContext context) async {

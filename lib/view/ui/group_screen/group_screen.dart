@@ -1,7 +1,9 @@
 import 'package:auto_id/bloc/admin_bloc/admin_data_bloc.dart';
 import 'package:auto_id/view/resources/styles_manager.dart';
 import 'package:auto_id/view/ui/group_screen/widgets/item_builder.dart';
+import 'package:auto_id/view/ui/group_screen/widgets/search_bar.dart';
 import 'package:flutter/services.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../shared/functions/dialogs.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +13,9 @@ import '../../shared/widgets/toast_helper.dart';
 
 class GroupScreen extends StatelessWidget {
   final int groupIndex;
-  const GroupScreen(this.groupIndex, {Key? key}) : super(key: key);
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+  GroupScreen(this.groupIndex, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +24,13 @@ class GroupScreen extends StatelessWidget {
           (next is LoadGroupDataState) || (next is GetInitialDataState),
       buildWhen: (prev, next) => next is LoadGroupDataState,
       listener: (context, state) {
-        if (state is LoadGroupDataState &&
-            state.status == AdminDataStatus.error) {
-          Navigator.of(context).pop();
+        if (state is LoadGroupDataState) {
+          if (state.status == AdminDataStatus.error) {
+            Navigator.of(context).pop();
+          } else if (state.status == AdminDataStatus.loaded &&
+              _refreshController.isLoading) {
+            _refreshController.refreshCompleted();
+          }
         } else if (state is GetInitialDataState &&
             state.status == AdminDataStatus.loaded) {
           Navigator.of(context).pop();
@@ -66,27 +74,40 @@ class GroupScreen extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
-            body:
-                //  SearchBar(state.groupList[groupIndex].studentNames),
-                Container(
-                    padding: const EdgeInsets.all(15),
-                    child: (state is LoadGroupDataState) &&
-                            (state.status == AdminDataStatus.loading)
-                        ? const Center(child: CircularProgressIndicator())
-                        : ListView.separated(
-                            itemCount: state.groupList[groupIndex].itemsLength,
-                            itemBuilder: (context, userIndex) {
-                              return GroupItemBuilder(
-                                  userIndex,
-                                  groupIndex,
-                                  state.groupList[groupIndex]
-                                      .studentNames![userIndex]);
-                            },
-                            separatorBuilder: (context, index) {
-                              return const SizedBox(
-                                height: 10,
-                              );
-                            })));
+            body: SmartRefresher(
+                enablePullUp: false,
+                controller: _refreshController,
+                onRefresh: () {
+                  context
+                      .read<AdminDataBloc>()
+                      .add(LoadGroupDataEvent(groupIndex, true));
+                },
+                child: Column(
+                  children: [
+                    //! expanded
+                    SearchBar(state.groupList[groupIndex].studentNames ?? []),
+                    Container(
+                        padding: const EdgeInsets.all(15),
+                        child: (state is LoadGroupDataState) &&
+                                (state.status == AdminDataStatus.loading)
+                            ? const Center(child: CircularProgressIndicator())
+                            : ListView.separated(
+                                itemCount:
+                                    state.groupList[groupIndex].itemsLength,
+                                itemBuilder: (context, userIndex) {
+                                  return GroupItemBuilder(
+                                      userIndex,
+                                      groupIndex,
+                                      state.groupList[groupIndex]
+                                          .studentNames![userIndex]);
+                                },
+                                separatorBuilder: (context, index) {
+                                  return const SizedBox(
+                                    height: 10,
+                                  );
+                                })),
+                  ],
+                )));
       },
     );
   }

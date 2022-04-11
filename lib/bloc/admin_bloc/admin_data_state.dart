@@ -51,9 +51,11 @@ class GetInitialDataState extends AdminDataStates {
 class LoadGroupDataState extends AdminDataStates {
   int groupIndex;
   bool loadingDelete;
+  bool force;
   LoadGroupDataState(
       {required this.groupIndex,
       this.loadingDelete = false,
+      this.force = false,
       AdminDataStatus status = AdminDataStatus.initial,
       CardStudent? cardStudent,
       List<GroupDetails> groupList = const []})
@@ -64,10 +66,11 @@ class LoadGroupDataState extends AdminDataStates {
 
   factory LoadGroupDataState.fromOldState(
       AdminDataStates oldState, AdminDataStatus status, int index,
-      {bool loadingSate = false}) {
+      {bool loadingSate = false, bool force = false}) {
     return LoadGroupDataState(
         groupIndex: index,
         loadingDelete: loadingSate,
+        force: force,
         cardStudent: oldState.cardStudent,
         groupList: oldState.groupList,
         status: status);
@@ -75,7 +78,7 @@ class LoadGroupDataState extends AdminDataStates {
 
   @override
   List<Object?> get props =>
-      [status, cardStudent, groupList.length, loadingDelete];
+      [status, cardStudent, groupList.length, loadingDelete, false];
 }
 
 class SignOutState extends AdminDataStates {

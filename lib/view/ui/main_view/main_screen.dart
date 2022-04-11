@@ -86,7 +86,8 @@ class MainScreen extends StatelessWidget {
                         state is GetInitialDataState) {
                       _refreshController.refreshCompleted();
                     } else if (state is LoadGroupDataState &&
-                        state.status == AdminDataStatus.loading) {
+                        (state.status == AdminDataStatus.loading) &&
+                        (!state.force)) {
                       navigateAndPush(context, GroupScreen(state.groupIndex));
                     }
                   },

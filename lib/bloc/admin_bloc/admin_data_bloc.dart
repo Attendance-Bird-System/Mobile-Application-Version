@@ -48,7 +48,8 @@ class AdminDataBloc extends Bloc<AdminDataEvent, AdminDataStates> {
   Future<void> _getGroupDataHandler(
       LoadGroupDataEvent event, Emitter emit) async {
     LoadGroupDataState.fromOldState(
-        state, AdminDataStatus.loading, event.groupIndex);
+        state, AdminDataStatus.loading, event.groupIndex,
+        force: event.force);
     if (state.groupList[event.groupIndex].columnNames == null) {
       try {
         state.groupList[event.groupIndex] = await _webServices.getGroupData(
@@ -58,7 +59,8 @@ class AdminDataBloc extends Bloc<AdminDataEvent, AdminDataStates> {
       } on DioErrors catch (err) {
         showToast(err.message, type: ToastType.error);
         LoadGroupDataState.fromOldState(
-            state, AdminDataStatus.error, event.groupIndex);
+            state, AdminDataStatus.error, event.groupIndex,
+            force: event.force);
       }
     }
   }
@@ -138,26 +140,12 @@ class AdminDataBloc extends Bloc<AdminDataEvent, AdminDataStates> {
     }
   }
 
-  Future<String?> createSpreadSheet(String groupName) async {
+  Future<void> createSpreadSheet(
+      String groupName, List<String> columnNames, Emitter emit) async {
     try {
-      return await _webServices.createSpreadSheet(groupName);
+      String id = await _webServices.createSpreadSheet(groupName);
+      addSheetColumnNames(id, groupName, columnNames, emit);
       // user deleted successfully
-    } on DioErrors catch (err) {
-      showToast(err.message, type: ToastType.error);
-      return null;
-    }
-  }
-
-  Future<void> testLink(String groupName, String link) async {
-    try {
-      dynamic value = await _webServices.testSheetLink(groupName, link);
-      if (value.toString().trim() == '-1') {
-        showToast(
-          "Invalid sheet please make sure that the url is public and editor",
-        );
-      } else {
-        // table is good and returned first two rows
-      }
     } on DioErrors catch (err) {
       showToast(err.message, type: ToastType.error);
     }
